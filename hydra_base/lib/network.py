@@ -56,7 +56,7 @@ except NameError:
     unicode = str
 
 
-def _update_attributes(resource_i, attributes):
+def _update_attributes(resource_i, attributes, user_id):
     if attributes is None:
         return dict()
     attrs = {}
@@ -84,6 +84,8 @@ def _update_attributes(resource_i, attributes):
         else:
             ra_i = attr_id_map[ra.id]
             ra_i.attr_is_var = ra.attr_is_var
+            ra_i.updated_by  = user_id
+            ra_i.updated_at  = datetime.datetime.now()
         attrs[ra.id] = ra_i
 
     return attrs
@@ -479,7 +481,7 @@ def add_network(network,**kwargs):
 
     name_map = {network.name:net_i}
     network_attrs, defaults = _bulk_add_resource_attrs(net_i.id, 'NETWORK', [network], name_map)
-    hdb.add_resource_types(net_i, network.types)
+    hdb.add_resource_types(net_i, network.types, user_id)
 
     all_resource_attrs.update(network_attrs)
 
@@ -1315,11 +1317,13 @@ def update_network(network,
     net_i.description         = network.description
     net_i.projection          = network.projection
     net_i.layout              = network.get_layout()
+    net_i.updated_by          = user_id
+    net_i.updated_at          = datetime.datetime.now() 
 
     all_resource_attrs = {}
-    new_network_attributes = _update_attributes(net_i, network.attributes)
+    new_network_attributes = _update_attributes(net_i, network.attributes, user_id)
     all_resource_attrs.update(new_network_attributes)
-    hdb.add_resource_types(net_i, network.types)
+    hdb.add_resource_types(net_i, network.types, user_id)
 
     #Maps temporary node_ids to real node_ids
     node_id_map = dict()
@@ -1340,18 +1344,21 @@ def update_network(network,
                 n._y          = node.y
                 n.status      = node.status
                 n.layout      = node.get_layout()
+                n.updated_by  = user_id
+                n.updated_at  = datetime.datetime.now()
             else:
                 log.info("Adding new node %s", node.name)
                 n = net_i.add_node(node.name,
                                    node.description,
                                    node.get_layout(),
                                    node.x,
-                                   node.y)
+                                   node.y,
+                                   user_id)
                 net_i.nodes.append(n)
                 node_id_map[n.id] = n
 
-            all_resource_attrs.update(_update_attributes(n, node.attributes))
-            hdb.add_resource_types(n, node.types)
+            all_resource_attrs.update(_update_attributes(n, node.attributes, user_id))
+            hdb.add_resource_types(n, node.types, user_id)
         log.info("Updating nodes took %s", time.time() - t0)
 
     link_id_map = dict()
@@ -1370,7 +1377,8 @@ def update_network(network,
                                    link.description,
                                    link.get_layout(),
                                    node_1,
-                                   node_2)
+                                   node_2,
+                                   user_id)
                 net_i.links.append(l)
                 link_id_map[link.id] = l
             else:
@@ -1382,8 +1390,8 @@ def update_network(network,
                 l.layout          = link.get_layout()
 
 
-            all_resource_attrs.update(_update_attributes(l, link.attributes))
-            hdb.add_resource_types(l, link.types)
+            all_resource_attrs.update(_update_attributes(l, link.attributes, user_id))
+            hdb.add_resource_types(l, link.types, user_id)
         log.info("Updating links took %s", time.time() - t0)
 
     group_id_map = dict()
@@ -1404,12 +1412,13 @@ def update_network(network,
                 log.info("Adding new group %s", group.name)
                 g_i = net_i.add_group(group.name,
                                    group.description,
-                                   group.status)
+                                   group.status,
+                                   user_id)
                 net_i.resourcegroups.append(net_i)
                 group_id_map[g_i.group_id] = g_i
 
-            all_resource_attrs.update(_update_attributes(g_i, group.attributes))
-            hdb.add_resource_types(g_i, group.types)
+            all_resource_attrs.update(_update_attributes(g_i, group.attributes, user_id))
+            hdb.add_resource_types(g_i, group.types, user_id)
             group_id_map[group.id] = g_i
         log.info("Updating groups took %s", time.time() - t0)
 
@@ -1689,12 +1698,14 @@ def update_node(node, flush=True, **kwargs):
     node_i.y    = node.y if node.y is not None else node_i.y
     node_i.description = node.description if node.description else node_i.description
     node_i.layout      = node.get_layout() if node.layout is not None else node_i.layout
+    node_i.updated_by  = user_id
+    node_i.updated_at  = datetime.datetime.now()
 
     if node.attributes is not None:
-        _update_attributes(node_i, node.attributes)
+        _update_attributes(node_i, node.attributes, user_id)
 
     if node.types is not None:
-        hdb.add_resource_types(node_i, node.types)
+        hdb.add_resource_types(node_i, node.types, user_id)
 
     if flush is True:
         db.DBSession.flush()
@@ -1741,6 +1752,10 @@ def set_node_status(node_id, status, **kwargs):
         link.status = status
     for link in node_i.links_from:
         link.status = status
+
+
+    node_i.updated_by  = user_id
+    node_i.updated_at  = datetime.datetime.now()
 
     db.DBSession.flush()
 
@@ -1932,8 +1947,11 @@ def update_link(link,**kwargs):
     link_i.description = link.description
     link_i.layout           = link.get_layout()
 
+    link_i.updated_by  = user_id
+    link_i.updated_at  = datetime.datetime.now()
+
     hdb.add_resource_attributes(link_i, link.attributes)
-    hdb.add_resource_types(link_i, link.types)
+    hdb.add_resource_types(link_i, link.types, user_id)
     db.DBSession.flush()
     return link_i
 
@@ -1951,6 +1969,10 @@ def set_link_status(link_id, status, **kwargs):
     link_i.network.check_write_permission(user_id)
 
     link_i.status = status
+
+    link_i.updated_by  = user_id
+    link_i.updated_at  = datetime.datetime.now()
+
     db.DBSession.flush()
 
 def delete_link(link_id, purge_data,**kwargs):
@@ -2048,11 +2070,14 @@ def update_group(group,**kwargs):
     group_i.name = group.name if group.name != None else group_i.name
     group_i.description = group.description if group.description else group_i.description
 
+    group_i.updated_by  = user_id
+    group_i.updated_at  = datetime.datetime.now()
+
     if group.attributes is not None:
-        _update_attributes(group_i, group.attributes)
+        _update_attributes(group_i, group.attributes, user_id)
 
     if group.types is not None:
-        hdb.add_resource_types(group_i, group.types)
+        hdb.add_resource_types(group_i, group.types, user_id)
 
     db.DBSession.flush()
 
@@ -2072,6 +2097,9 @@ def set_group_status(group_id, status, **kwargs):
     group_i.network.check_write_permission(user_id)
 
     group_i.status = status
+
+    group_i.updated_by  = user_id
+    group_i.updated_at  = datetime.datetime.now()
 
     db.DBSession.flush()
 

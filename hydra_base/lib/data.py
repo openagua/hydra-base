@@ -452,7 +452,8 @@ def update_dataset(dataset_id, name, data_type, val, units, metadata={}, flush=T
 
         dataset.unit = units
         dataset.name  = name
-        dataset.created_by = kwargs['user_id']
+        dataset.updated_by = kwargs['user_id']
+        dataset.updated_at = datetime.datetime.now()
         dataset.hash  = dataset.set_hash()
 
         #Is there a dataset in the DB already which is identical to the updated dataset?

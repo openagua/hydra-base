@@ -61,6 +61,8 @@ def add_rule(scenario_id, rule, **kwargs):
 
     rule_i.value = rule.value
 
+    rule_i.created_by = kwargs.get('user_id')
+
     db.DBSession.add(rule_i)
     db.DBSession.flush()
 
@@ -88,6 +90,9 @@ def update_rule(rule, **kwargs):
     rule_i.description = rule.description
 
     rule_i.value = rule.value
+
+    rule_i.updated_by = kwargs.get('user_id')
+    rule_i.updated_at = datetime.datetime.now()
 
     db.DBSession.flush()
 

@@ -92,6 +92,9 @@ def update_note(note, **kwargs):
 
     note_i.value = note.value
 
+    note_i.updated_by = kwargs.get('user_id')
+    note_i.updated_at = datetime.datetime.now()
+
     db.DBSession.flush()
 
     return note_i

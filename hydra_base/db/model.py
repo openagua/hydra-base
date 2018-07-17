@@ -94,8 +94,12 @@ class Dataset(Base, Inspect):
     type       = Column(String(60),  nullable=False)
     unit       = Column(String(60))
     hash       = Column(BIGINT(),  nullable=False, unique=True)
+
     cr_date    = Column(TIMESTAMP(),  nullable=False, server_default=text(u'CURRENT_TIMESTAMP'))
     created_by = Column(Integer(), ForeignKey('tUser.id'))
+    updated_by = Column(Integer(), ForeignKey('tUser.id'), nullable=True)
+    updated_at = Column(TIMESTAMP(),  nullable=False, server_default=text(u'CURRENT_TIMESTAMP'))
+   
     hidden     = Column(String(1),  nullable=False, server_default=text(u"'N'"))
     value      = Column('value', Text().with_variant(mysql.TEXT(4294967295), 'mysql'),  nullable=True)
 
@@ -268,7 +272,11 @@ class DatasetCollection(Base, Inspect):
 
     id = Column(Integer(), primary_key=True, nullable=False)
     name = Column(String(60),  nullable=False)
+
+    created_by = Column(Integer(), ForeignKey('tUser.id'))
     cr_date = Column(TIMESTAMP(),  nullable=False, server_default=text(u'CURRENT_TIMESTAMP'))
+    updated_by = Column(Integer(), ForeignKey('tUser.id'), nullable=True)
+    updated_at = Column(TIMESTAMP(),  nullable=False, server_default=text(u'CURRENT_TIMESTAMP'))
 
     _parents  = ['tDataset']
     _children = ['tDatasetCollectionItem']
@@ -281,6 +289,9 @@ class DatasetCollectionItem(Base, Inspect):
 
     collection_id = Column(Integer(), ForeignKey('tDatasetCollection.id'), primary_key=True, nullable=False)
     dataset_id = Column(Integer(), ForeignKey('tDataset.id'), primary_key=True, nullable=False)
+
+
+    created_by = Column(Integer(), ForeignKey('tUser.id'))
     cr_date = Column(TIMESTAMP(),  nullable=False, server_default=text(u'CURRENT_TIMESTAMP'))
 
     collection = relationship('DatasetCollection', backref=backref("items", order_by=dataset_id, cascade="all, delete-orphan"))
@@ -322,7 +333,11 @@ class Attr(Base, Inspect):
     name         = Column(String(60),  nullable=False)
     dimension    = Column(String(60), server_default=text(u"'dimensionless'"))
     description  = Column(String(1000))
+
+    created_by = Column(Integer(), ForeignKey('tUser.id'))
     cr_date = Column(TIMESTAMP(),  nullable=False, server_default=text(u'CURRENT_TIMESTAMP'))
+    updated_by = Column(Integer(), ForeignKey('tUser.id'), nullable=True)
+    updated_at = Column(TIMESTAMP(),  nullable=False, server_default=text(u'CURRENT_TIMESTAMP'))
 
 class AttrMap(Base, Inspect):
     """
@@ -355,7 +370,11 @@ class AttrGroup(Base, Inspect):
     layout           = Column(Text().with_variant(mysql.TEXT(4294967295), 'mysql'),  nullable=True)
     exclusive        = Column(String(1),  nullable=False, server_default=text(u"'N'"))
     project_id       = Column(Integer(), ForeignKey('tProject.id'), primary_key=False, nullable=False)
-    cr_date          = Column(TIMESTAMP(),  nullable=False, server_default=text(u'CURRENT_TIMESTAMP'))
+
+    created_by = Column(Integer(), ForeignKey('tUser.id'))
+    cr_date = Column(TIMESTAMP(),  nullable=False, server_default=text(u'CURRENT_TIMESTAMP'))
+    updated_by = Column(Integer(), ForeignKey('tUser.id'), nullable=True)
+    updated_at = Column(TIMESTAMP(),  nullable=False, server_default=text(u'CURRENT_TIMESTAMP'))
 
     project          = relationship('Project', backref=backref('attrgroups', uselist=True, cascade="all, delete-orphan"), lazy='joined')
 
@@ -408,8 +427,12 @@ class Template(Base, Inspect):
 
     id = Column(Integer(), primary_key=True, nullable=False)
     name = Column(String(60),  nullable=False, unique=True)
-    cr_date = Column(TIMESTAMP(),  nullable=False, server_default=text(u'CURRENT_TIMESTAMP'))
     layout  = Column(Text().with_variant(mysql.TEXT(4294967295), 'mysql'),  nullable=True)
+
+    created_by = Column(Integer(), ForeignKey('tUser.id'))
+    cr_date = Column(TIMESTAMP(),  nullable=False, server_default=text(u'CURRENT_TIMESTAMP'))
+    updated_by = Column(Integer(), ForeignKey('tUser.id'), nullable=True)
+    updated_at = Column(TIMESTAMP(),  nullable=False, server_default=text(u'CURRENT_TIMESTAMP'))
 
     _parents  = []
     _children = ['tTemplateType']
@@ -429,7 +452,12 @@ class TemplateType(Base, Inspect):
     resource_type = Column(String(60))
     alias = Column(String(100))
     layout  = Column(Text().with_variant(mysql.TEXT(4294967295), 'mysql'),  nullable=True)
+
+    created_by = Column(Integer(), ForeignKey('tUser.id'))
     cr_date = Column(TIMESTAMP(),  nullable=False, server_default=text(u'CURRENT_TIMESTAMP'))
+    updated_by = Column(Integer(), ForeignKey('tUser.id'), nullable=True)
+    updated_at = Column(TIMESTAMP(),  nullable=False, server_default=text(u'CURRENT_TIMESTAMP'))
+
 
     template = relationship('Template', backref=backref("templatetypes", order_by=id, cascade="all, delete-orphan"))
 
@@ -452,7 +480,12 @@ class TypeAttr(Base, Inspect):
     unit               = Column(String(60))
     description        = Column(String(1000))
     properties         = Column(Text().with_variant(mysql.TEXT(4294967295), 'mysql'),  nullable=True)
+
+    created_by = Column(Integer(), ForeignKey('tUser.id'))
     cr_date = Column(TIMESTAMP(),  nullable=False, server_default=text(u'CURRENT_TIMESTAMP'))
+    updated_by = Column(Integer(), ForeignKey('tUser.id'), nullable=True)
+    updated_at = Column(TIMESTAMP(),  nullable=False, server_default=text(u'CURRENT_TIMESTAMP'))
+
 
     attr = relationship('Attr')
     templatetype = relationship('TemplateType',  backref=backref("typeattrs", order_by=attr_id, cascade="all, delete-orphan"))
@@ -494,7 +527,11 @@ class ResourceAttr(Base, Inspect):
     link_id     = Column(Integer(),  ForeignKey('tLink.id'), index=True, nullable=True)
     group_id    = Column(Integer(),  ForeignKey('tResourceGroup.id'), index=True, nullable=True)
     attr_is_var = Column(String(1),  nullable=False, server_default=text(u"'N'"))
+
+    created_by = Column(Integer(), ForeignKey('tUser.id'))
     cr_date = Column(TIMESTAMP(),  nullable=False, server_default=text(u'CURRENT_TIMESTAMP'))
+    updated_by = Column(Integer(), ForeignKey('tUser.id'), nullable=True)
+    updated_at = Column(TIMESTAMP(),  nullable=False, server_default=text(u'CURRENT_TIMESTAMP'))
 
     attr = relationship('Attr')
     project = relationship('Project', backref=backref('attributes', uselist=True, cascade="all, delete-orphan"), uselist=False)
@@ -580,8 +617,9 @@ class ResourceType(Base, Inspect):
     node_id     = Column(Integer(),  ForeignKey('tNode.id'), nullable=True)
     link_id     = Column(Integer(),  ForeignKey('tLink.id'), nullable=True)
     group_id    = Column(Integer(),  ForeignKey('tResourceGroup.id'), nullable=True)
-    cr_date = Column(TIMESTAMP(),  nullable=False, server_default=text(u'CURRENT_TIMESTAMP'))
 
+    created_by = Column(Integer(), ForeignKey('tUser.id'))
+    cr_date = Column(TIMESTAMP(),  nullable=False, server_default=text(u'CURRENT_TIMESTAMP'))
 
     templatetype = relationship('TemplateType', backref=backref('resourcetypes', uselist=True, cascade="all, delete-orphan"))
 
@@ -641,8 +679,11 @@ class Project(Base, Inspect):
     name = Column(String(60),  nullable=False, unique=False)
     description = Column(String(1000))
     status = Column(String(1),  nullable=False, server_default=text(u"'A'"))
+
     cr_date = Column(TIMESTAMP(),  nullable=False, server_default=text(u'CURRENT_TIMESTAMP'))
     created_by = Column(Integer(), ForeignKey('tUser.id'), nullable=False)
+    updated_by = Column(Integer(), ForeignKey('tUser.id'), nullable=True)
+    updated_at = Column(TIMESTAMP(),  nullable=False, server_default=text(u'CURRENT_TIMESTAMP'))
 
     user = relationship('User', backref=backref("projects", order_by=id))
 
@@ -756,9 +797,12 @@ class Network(Base, Inspect):
     layout  = Column(Text().with_variant(mysql.TEXT(4294967295), 'mysql'),  nullable=True)
     project_id = Column(Integer(), ForeignKey('tProject.id'),  nullable=False)
     status = Column(String(1),  nullable=False, server_default=text(u"'A'"))
-    cr_date = Column(TIMESTAMP(),  nullable=False, server_default=text(u'CURRENT_TIMESTAMP'))
     projection = Column(String(200))
+    
+    cr_date = Column(TIMESTAMP(),  nullable=False, server_default=text(u'CURRENT_TIMESTAMP'))
     created_by = Column(Integer(), ForeignKey('tUser.id'), nullable=False)
+    updated_by = Column(Integer(), ForeignKey('tUser.id'), nullable=True)
+    updated_at = Column(TIMESTAMP(),  nullable=False, server_default=text(u'CURRENT_TIMESTAMP'))
 
     project = relationship('Project', backref=backref("networks", order_by="asc(Network.cr_date)", cascade="all, delete-orphan"))
 
@@ -768,17 +812,18 @@ class Network(Base, Inspect):
     def get_name(self):
         return self.name
 
-    def add_attribute(self, attr_id, attr_is_var='N'):
+    def add_attribute(self, attr_id, user_id, attr_is_var='N'):
         res_attr = ResourceAttr()
         res_attr.attr_id = attr_id
         res_attr.attr_is_var = attr_is_var
         res_attr.ref_key = self.ref_key
         res_attr.network_id  = self.id
+        res_attr.created_by  = user_id
         self.attributes.append(res_attr)
 
         return res_attr
 
-    def add_link(self, name, desc, layout, node_1, node_2):
+    def add_link(self, name, desc, layout, node_1, node_2, user_id):
         """
             Add a link to a network. Links are what effectively
             define the network topology, by associating two already
@@ -795,6 +840,7 @@ class Network(Base, Inspect):
         l.layout           = str(layout) if layout is not None else None
         l.node_a           = node_1
         l.node_b           = node_2
+        l.created_by       = user_id
 
         get_session().add(l)
 
@@ -803,7 +849,7 @@ class Network(Base, Inspect):
         return l
 
 
-    def add_node(self, name, desc, layout, node_x, node_y):
+    def add_node(self, name, desc, layout, node_x, node_y, user_id):
         """
             Add a node to a network.
         """
@@ -817,6 +863,7 @@ class Network(Base, Inspect):
         node.layout      = str(layout) if layout is not None else None
         node.x           = node_x
         node.y           = node_y
+        node.created_by  = user_id
 
         #Do not call save here because it is likely that we may want
         #to bulk insert nodes, not one at a time.
@@ -827,7 +874,7 @@ class Network(Base, Inspect):
 
         return node
 
-    def add_group(self, name, desc, status):
+    def add_group(self, name, desc, status, user_id):
         """
             Add a new group to a network.
         """
@@ -840,6 +887,7 @@ class Network(Base, Inspect):
         group_i.name        = name
         group_i.description = desc
         group_i.status      = status
+        group_i.created_by  = user_id
 
         get_session().add(group_i)
 
@@ -857,6 +905,7 @@ class Network(Base, Inspect):
         else:
             owner = NetworkOwner()
             owner.network_id = self.id
+            owner.created_by = user_id
             self.owners.append(owner)
 
         owner.user_id = int(user_id)
@@ -947,7 +996,11 @@ class Link(Base, Inspect):
     name = Column(String(60))
     description = Column(String(1000))
     layout  = Column(Text().with_variant(mysql.TEXT(4294967295), 'mysql'),  nullable=True)
+
     cr_date = Column(TIMESTAMP(),  nullable=False, server_default=text(u'CURRENT_TIMESTAMP'))
+    created_by = Column(Integer(), ForeignKey('tUser.id'), nullable=True)
+    updated_by = Column(Integer(), ForeignKey('tUser.id'), nullable=True)
+    updated_at = Column(TIMESTAMP(),  nullable=False, server_default=text(u'CURRENT_TIMESTAMP'))
 
     network = relationship('Network', backref=backref("links", order_by=network_id, cascade="all, delete-orphan"), lazy='joined')
     node_a = relationship('Node', foreign_keys=[node_1_id], backref=backref("links_to", order_by=id, cascade="all, delete-orphan"))
@@ -1021,7 +1074,11 @@ class Node(Base, Inspect):
     x = Column(Float(precision=10, asdecimal=True))
     y = Column(Float(precision=10, asdecimal=True))
     layout  = Column(Text().with_variant(mysql.TEXT(4294967295), 'mysql'),  nullable=True)
+
     cr_date = Column(TIMESTAMP(),  nullable=False, server_default=text(u'CURRENT_TIMESTAMP'))
+    created_by = Column(Integer(), ForeignKey('tUser.id'), nullable=True)
+    updated_by = Column(Integer(), ForeignKey('tUser.id'), nullable=True)
+    updated_at = Column(TIMESTAMP(),  nullable=False, server_default=text(u'CURRENT_TIMESTAMP'))
 
     network = relationship('Network', backref=backref("nodes", order_by=network_id, cascade="all, delete-orphan"), lazy='joined')
 
@@ -1089,8 +1146,12 @@ class ResourceGroup(Base, Inspect):
     name = Column(String(60),  nullable=False)
     description = Column(String(1000))
     status = Column(String(1),  nullable=False, server_default=text(u"'A'"))
-    cr_date = Column(TIMESTAMP(),  nullable=False, server_default=text(u'CURRENT_TIMESTAMP'))
     network_id = Column(Integer(), ForeignKey('tNetwork.id'),  nullable=False)
+
+    cr_date = Column(TIMESTAMP(),  nullable=False, server_default=text(u'CURRENT_TIMESTAMP'))
+    created_by = Column(Integer(), ForeignKey('tUser.id'), nullable=True)
+    updated_by = Column(Integer(), ForeignKey('tUser.id'), nullable=True)
+    updated_at = Column(TIMESTAMP(),  nullable=False, server_default=text(u'CURRENT_TIMESTAMP'))
 
     network = relationship('Network', backref=backref("resourcegroups", order_by=id, cascade="all, delete-orphan"), lazy='joined')
 
@@ -1218,7 +1279,11 @@ class ResourceScenario(Base, Inspect):
     scenario_id = Column(Integer(), ForeignKey('tScenario.id'), primary_key=True, nullable=False, index=True)
     resource_attr_id = Column(Integer(), ForeignKey('tResourceAttr.id'), primary_key=True, nullable=False, index=True)
     source           = Column(String(60))
+
     cr_date = Column(TIMESTAMP(),  nullable=False, server_default=text(u'CURRENT_TIMESTAMP'))
+    created_by = Column(Integer(), ForeignKey('tUser.id'), nullable=False)
+    updated_by = Column(Integer(), ForeignKey('tUser.id'), nullable=True)
+    updated_at = Column(TIMESTAMP(),  nullable=False, server_default=text(u'CURRENT_TIMESTAMP'))
 
     dataset      = relationship('Dataset', backref=backref("resourcescenarios", order_by=dataset_id))
     scenario     = relationship('Scenario', backref=backref("resourcescenarios", order_by=scenario_id, cascade="all, delete-orphan"))
@@ -1264,8 +1329,11 @@ class Scenario(Base, Inspect):
     end_time = Column(String(60))
     locked = Column(String(1),  nullable=False, server_default=text(u"'N'"))
     time_step = Column(String(60))
+
     cr_date = Column(TIMESTAMP(),  nullable=False, server_default=text(u'CURRENT_TIMESTAMP'))
     created_by = Column(Integer(), ForeignKey('tUser.id'), nullable=False)
+    updated_by = Column(Integer(), ForeignKey('tUser.id'), nullable=True)
+    updated_at = Column(TIMESTAMP(),  nullable=False, server_default=text(u'CURRENT_TIMESTAMP'))
 
     network = relationship('Network', backref=backref("scenarios", order_by=id))
 
@@ -1317,6 +1385,10 @@ class Rule(Base, Inspect):
     description = Column(String(1000), nullable=False)
 
     cr_date = Column(TIMESTAMP(),  nullable=False, server_default=text(u'CURRENT_TIMESTAMP'))
+    created_by = Column(Integer(), ForeignKey('tUser.id'), nullable=False)
+    updated_by = Column(Integer(), ForeignKey('tUser.id'), nullable=True)
+    updated_at = Column(TIMESTAMP(),  nullable=False, server_default=text(u'CURRENT_TIMESTAMP'))
+
     ref_key = Column(String(60),  nullable=False, index=True)
 
     value = Column(Text().with_variant(mysql.TEXT(4294967295), 'mysql'),  nullable=True)
@@ -1346,14 +1418,17 @@ class Note(Base, Inspect):
     id = Column(Integer(), primary_key=True, nullable=False)
     ref_key = Column(String(60),  nullable=False, index=True)
     value = Column(LargeBinary(),  nullable=True)
-    created_by = Column(Integer(), ForeignKey('tUser.id'))
-    cr_date = Column(TIMESTAMP(),  nullable=False, server_default=text(u'CURRENT_TIMESTAMP'))
     scenario_id = Column(Integer(), ForeignKey('tScenario.id'),  index=True, nullable=True)
     project_id = Column(Integer(), ForeignKey('tProject.id'),  index=True, nullable=True)
     network_id  = Column(Integer(),  ForeignKey('tNetwork.id'), index=True, nullable=True,)
     node_id     = Column(Integer(),  ForeignKey('tNode.id'), index=True, nullable=True)
     link_id     = Column(Integer(),  ForeignKey('tLink.id'), index=True, nullable=True)
     group_id    = Column(Integer(),  ForeignKey('tResourceGroup.id'), index=True, nullable=True)
+
+    created_by = Column(Integer(), ForeignKey('tUser.id'))
+    cr_date = Column(TIMESTAMP(),  nullable=False, server_default=text(u'CURRENT_TIMESTAMP'))
+    updated_by = Column(Integer(), ForeignKey('tUser.id'), nullable=True)
+    updated_at = Column(TIMESTAMP(),  nullable=False, server_default=text(u'CURRENT_TIMESTAMP'))
 
     scenario = relationship('Scenario', backref=backref('notes', uselist=True, cascade="all, delete-orphan"), uselist=True, lazy='joined')
     node = relationship('Node', backref=backref('notes', uselist=True, cascade="all, delete-orphan"), uselist=True, lazy='joined')
@@ -1433,10 +1508,15 @@ class ProjectOwner(Base, Inspect):
 
     user_id = Column(Integer(), ForeignKey('tUser.id'), primary_key=True, nullable=False)
     project_id = Column(Integer(), ForeignKey('tProject.id'), primary_key=True, nullable=False)
+
     cr_date = Column(TIMESTAMP(),  nullable=False, server_default=text(u'CURRENT_TIMESTAMP'))
-    view = Column(String(1),  nullable=False)
-    edit = Column(String(1),  nullable=False)
-    share = Column(String(1),  nullable=False)
+    created_by = Column(Integer(), ForeignKey('tUser.id'), nullable=False)
+    updated_by = Column(Integer(), ForeignKey('tUser.id'), nullable=True)
+    updated_at = Column(TIMESTAMP(),  nullable=False, server_default=text(u'CURRENT_TIMESTAMP'))
+
+    view = Column(String(1),  nullable=False, server_default=text(u'Y'))
+    edit = Column(String(1),  nullable=False, server_default=text(u'Y'))
+    share = Column(String(1),  nullable=False, server_default=text(u'Y'))
 
     user = relationship('User')
     project = relationship('Project', backref=backref('owners', order_by=user_id, uselist=True, cascade="all, delete-orphan"))
@@ -1452,10 +1532,15 @@ class NetworkOwner(Base, Inspect):
 
     user_id = Column(Integer(), ForeignKey('tUser.id'), primary_key=True, nullable=False)
     network_id = Column(Integer(), ForeignKey('tNetwork.id'), primary_key=True, nullable=False)
+
     cr_date = Column(TIMESTAMP(),  nullable=False, server_default=text(u'CURRENT_TIMESTAMP'))
-    view = Column(String(1),  nullable=False)
-    edit = Column(String(1),  nullable=False)
-    share = Column(String(1),  nullable=False)
+    created_by = Column(Integer(), ForeignKey('tUser.id'), nullable=False)
+    updated_by = Column(Integer(), ForeignKey('tUser.id'), nullable=True)
+    updated_at = Column(TIMESTAMP(),  nullable=False, server_default=text(u'CURRENT_TIMESTAMP'))
+    
+    view = Column(String(1),  nullable=False, server_default=text(u'Y'))
+    edit = Column(String(1),  nullable=False, server_default=text(u'Y'))
+    share = Column(String(1),  nullable=False, server_default=text(u'Y'))
 
     user = relationship('User')
     network = relationship('Network', backref=backref('owners', order_by=user_id, uselist=True, cascade="all, delete-orphan"))
@@ -1471,7 +1556,12 @@ class DatasetOwner(Base, Inspect):
 
     user_id = Column(Integer(), ForeignKey('tUser.id'), primary_key=True, nullable=False)
     dataset_id = Column(Integer(), ForeignKey('tDataset.id'), primary_key=True, nullable=False)
+
     cr_date = Column(TIMESTAMP(),  nullable=False, server_default=text(u'CURRENT_TIMESTAMP'))
+    created_by = Column(Integer(), ForeignKey('tUser.id'), nullable=False)
+    updated_by = Column(Integer(), ForeignKey('tUser.id'), nullable=True)
+    updated_at = Column(TIMESTAMP(),  nullable=False, server_default=text(u'CURRENT_TIMESTAMP'))
+
     view = Column(String(1),  nullable=False)
     edit = Column(String(1),  nullable=False)
     share = Column(String(1),  nullable=False)
@@ -1491,7 +1581,12 @@ class Perm(Base, Inspect):
     id = Column(Integer(), primary_key=True, nullable=False)
     code = Column(String(60),  nullable=False)
     name = Column(String(60),  nullable=False)
+
     cr_date = Column(TIMESTAMP(),  nullable=False, server_default=text(u'CURRENT_TIMESTAMP'))
+    created_by = Column(Integer(), ForeignKey('tUser.id'), nullable=False)
+    updated_by = Column(Integer(), ForeignKey('tUser.id'), nullable=True)
+    updated_at = Column(TIMESTAMP(),  nullable=False, server_default=text(u'CURRENT_TIMESTAMP'))
+ 
     roleperms = relationship('RolePerm', lazy='joined')
 
     _parents  = ['tRole', 'tPerm']
@@ -1506,7 +1601,12 @@ class Role(Base, Inspect):
     id = Column(Integer(), primary_key=True, nullable=False)
     code = Column(String(60),  nullable=False)
     name = Column(String(60),  nullable=False)
+
     cr_date = Column(TIMESTAMP(),  nullable=False, server_default=text(u'CURRENT_TIMESTAMP'))
+    created_by = Column(Integer(), ForeignKey('tUser.id'), nullable=False)
+    updated_by = Column(Integer(), ForeignKey('tUser.id'), nullable=True)
+    updated_at = Column(TIMESTAMP(),  nullable=False, server_default=text(u'CURRENT_TIMESTAMP'))
+
     roleperms = relationship('RolePerm', lazy='joined', cascade='all')
     roleusers = relationship('RoleUser', lazy='joined', cascade='all')
 
@@ -1526,7 +1626,11 @@ class RolePerm(Base, Inspect):
 
     perm_id = Column(Integer(), ForeignKey('tPerm.id'), primary_key=True, nullable=False)
     role_id = Column(Integer(), ForeignKey('tRole.id'), primary_key=True, nullable=False)
+
     cr_date = Column(TIMESTAMP(),  nullable=False, server_default=text(u'CURRENT_TIMESTAMP'))
+    created_by = Column(Integer(), ForeignKey('tUser.id'), nullable=False)
+    updated_by = Column(Integer(), ForeignKey('tUser.id'), nullable=True)
+    updated_at = Column(TIMESTAMP(),  nullable=False, server_default=text(u'CURRENT_TIMESTAMP'))
 
     perm = relationship('Perm', lazy='joined')
     role = relationship('Role', lazy='joined')
@@ -1542,7 +1646,11 @@ class RoleUser(Base, Inspect):
 
     user_id = Column(Integer(), ForeignKey('tUser.id'), primary_key=True, nullable=False)
     role_id = Column(Integer(), ForeignKey('tRole.id'), primary_key=True, nullable=False)
+
     cr_date = Column(TIMESTAMP(),  nullable=False, server_default=text(u'CURRENT_TIMESTAMP'))
+    created_by = Column(Integer(), ForeignKey('tUser.id'), nullable=False)
+    updated_by = Column(Integer(), ForeignKey('tUser.id'), nullable=True)
+    updated_at = Column(TIMESTAMP(),  nullable=False, server_default=text(u'CURRENT_TIMESTAMP'))
 
     user = relationship('User', lazy='joined')
     role = relationship('Role', lazy='joined')
@@ -1562,7 +1670,13 @@ class User(Base, Inspect):
     display_name = Column(String(60),  nullable=False, server_default=text(u"''"))
     last_login = Column(TIMESTAMP())
     last_edit = Column(TIMESTAMP())
+
     cr_date = Column(TIMESTAMP(),  nullable=False, server_default=text(u'CURRENT_TIMESTAMP'))
+    created_by = Column(Integer(), ForeignKey('tUser.id'), nullable=False)
+    updated_by = Column(Integer(), ForeignKey('tUser.id'), nullable=True)
+    updated_at = Column(TIMESTAMP(),  nullable=False, server_default=text(u'CURRENT_TIMESTAMP'))
+
+
     roleusers = relationship('RoleUser', lazy='joined')
 
     _parents  = []

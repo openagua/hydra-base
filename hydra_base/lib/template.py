@@ -327,15 +327,12 @@ def get_template_as_dict(template_id, **kwargs):
     dataset_dict = {}
 
     template_i = db.DBSession.query(Template).filter(
-            Template.id==template_id).options(
-                joinedload_all('templatetypes.typeattrs.default_dataset.metadata'
-                              )
-            ).one()
-
-    #Load all the attributes
-    for type_i in template_i.templatetypes:
-        for typeattr_i in type_i.typeattrs:
-            typeattr_i.attr
+            Template.id==template_id).one()
+    for tt in template_i.templatetypes:
+        for ta in tt.typeattrs:
+            ta.attr
+            if ta.default_dataset is not None:
+                ta.default_dataset.metadata
 
     template_j = JSONObject(template_i)
 

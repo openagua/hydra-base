@@ -29,7 +29,7 @@ import logging
 log = logging.getLogger(__name__)
 
 
-def add_resource_types(resource_i, types):
+def add_resource_types(resource_i, types, user_id):
     """
     Save a reference to the types used for this resource.
 
@@ -54,6 +54,7 @@ def add_resource_types(resource_i, types):
         rt_i = ResourceType()
         rt_i.type_id     = templatetype.id
         rt_i.ref_key     = resource_i.ref_key
+        rt_i.created_by  = user_id
         if resource_i.ref_key == 'NODE':
             rt_i.node_id      = resource_i.id
         elif resource_i.ref_key == 'LINK':

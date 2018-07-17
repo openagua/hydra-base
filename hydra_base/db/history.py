@@ -27,15 +27,13 @@ from sqlalchemy import create_engine,\
         DDL
 from sqlalchemy.engine import reflection
 import logging
-from hydra_base import config
+from mysql.connector.connection import MySQLConnection
+import .config
 from subprocess import Popen
 from sqlalchemy.types import DECIMAL, NUMERIC
 from sqlalchemy.dialects.mysql.base import DOUBLE
 from decimal import Decimal
 import os
-
-import logging
-log = logging.getLogger(__name__)
 
 engine_name = config.get('mysqld', 'url')
 sqlite_engine = "sqlite:///%s"%(config.get('sqlite', 'backup_url'))
@@ -44,6 +42,8 @@ def connect():
     """
         return an inspector object
     """
+   # MySQLConnection.get_characterset_info = MySQLConnection.get_charset
+
     db = create_engine(engine_name, echo=True)
     db.connect()
     
@@ -109,11 +109,8 @@ def run():
     for t in tables:
         audit_table = create_audit_table(t)
         audit_tables.append(audit_table)
-    try:        
-        create_sqlite_backup_db(audit_tables)
-    except Exception as e:
-        log.critical("Unable to make backup!")
-        log.exception(e)
+        
+    create_sqlite_backup_db(audit_tables)
     create_triggers(db, tables)
     metadata.create_all()
 
@@ -147,7 +144,7 @@ def create_triggers(db, tables):
         for pk_col in pk_cols:
             try:
                 db.execute(drop_trigger_text % {
-                    'trigger_name' : table.name + "_ins_trig",
+                    'trigger_name' : table.name + "_ins_hist_trig",
                 })
             except:
                 pass
@@ -155,7 +152,7 @@ def create_triggers(db, tables):
         for pk_col in pk_cols:
             try:
                 db.execute(drop_trigger_text % {
-                    'trigger_name' : table.name + "_upd_trig",
+                    'trigger_name' : table.name + "_upd_hist_trig",
                 })
             except:
                 pass
@@ -168,9 +165,8 @@ def create_triggers(db, tables):
                         %(table_name)s
                     FOR EACH ROW
                         BEGIN
-                            INSERT INTO %(table_name)s_aud
+                            INSERT INTO %(table_name)sHistory
                             SELECT
-                                d.*,
                                 '%(action)s',
                                 NULL,
                                 date('now')

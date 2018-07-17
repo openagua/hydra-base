@@ -250,6 +250,8 @@ def update_scenario(scenario,update_data=True,update_groups=True,flush=True,**kw
     scen.start_time           = start_time
     scen.end_time             = end_time
     scen.time_step            = scenario.time_step
+    scen.updated_by           = user_id
+    scen.updated_at           = datetime.datetime.now()
 
     if scenario.resourcescenarios == None:
         scenario.resourcescenarios = []
@@ -724,6 +726,7 @@ def _update_resourcescenario(scenario, resource_scenario, dataset=None, new=Fals
         r_scen_i.resource_attr_id = resource_scenario.resource_attr_id
         r_scen_i.scenario_id      = scenario.id
         r_scen_i.scenario = scenario
+        r_scen_i.created_by = user_id
 
         db.DBSession.add(r_scen_i)
 
@@ -822,6 +825,9 @@ def assign_value(rs, data_type, val,
         rs.dataset = dataset
         rs.source = source
 
+    rs.updated_by = user_id
+    rs.updated_at = datetime.datetime.now()
+
     db.DBSession.flush()
 
 def add_data_to_attribute(scenario_id, resource_attr_id, dataset,**kwargs):
@@ -844,6 +850,7 @@ def add_data_to_attribute(scenario_id, resource_attr_id, dataset,**kwargs):
         r_scen_i = ResourceScenario()
         r_scen_i.scenario_id      = scenario_id
         r_scen_i.resource_attr_id = resource_attr_id
+        r_scen_i.created_by       = user_id
         scenario_i.resourcescenarios.append(r_scen_i)
 
     data_type = dataset.type.lower()
