@@ -22,24 +22,9 @@ import logging
 log = logging.getLogger(__name__)
 
 
-class DataTypeMeta(ABCMeta):
-    def __new__(cls, clsname, bases, attrs):
-        newclass = super(DataTypeMeta, cls).__new__(cls, clsname, bases, attrs)
-
-        # Register class with hydra
-        from .Registry import typemap
-        if clsname != 'DataType':
-            if newclass.tag in typemap:
-                raise ValueError('Type with tag "{}" already registered.'.format(newclass.tag))
-            else:
-                typemap[newclass.tag] = newclass
-                log.info('Registering data type "{}".'.format(newclass.tag))
-        return newclass
-
-
-@six.add_metaclass(DataTypeMeta)
 class DataType(object):
     """ The DataType class serves as an abstract base class for data types"""
+    __metaclass__ = ABCMeta
 
     @abstractproperty
     def skeleton(self):
@@ -73,7 +58,7 @@ class DataType(object):
         pass
 
     @abstractmethod
-    def fromDataset(cls, value, metadata=None):
+    def fromDataset(self):
         """ Factory method which performs any required transformations
             on a dataset argument, invokes the type's ctor, and returns
             the resulting instance
@@ -81,13 +66,25 @@ class DataType(object):
         pass
 
 
+
 class Scalar(DataType):
-    tag      = "SCALAR"
-    skeleton = "[%f]"
-    json     = ScalarJSON()
+    tag       = "SCALAR"
+    skeleton  = "[%f]"
+    json      = ScalarJSON()
+    ui_schema = { "name" : "Scalar",
+                  "edit" : { "type" : "input",
+                  "attrs" : {
+                    "class": "scalar value",
+                    "id"   : "scalar-input-{attr_id}",
+                    "name" : "value",
+                    "step" : "any",
+                    "type" : "number",
+                    "gentime": "{gentime}",
+                    "value": "{value}"}
+                }
+    }
 
     def __init__(self, value):
-        super(Scalar, self).__init__()
         self.value = value
         self.validate()
 
@@ -105,7 +102,40 @@ class Scalar(DataType):
     def set_value(self, val):
         self._value = val
 
+
+    @staticmethod
+    def scalar_input(schema):
+        output = """<{type} {{0}}></{type}>""".format_map(schema)
+        attr_format = """{0}='{1}'"""
+        attr_texts  = [ attr_format.format(attr, val) for attr,val in schema["attrs"].items()]
+        return output.format(" ".join(attr_texts))
+
+
+    @staticmethod
+    def input(rs):
+        base = Scalar.scalar_input(Scalar.ui_schema["edit"])
+
+        attr_id = rs.attr_id
+        value   = rs.dataset.value if rs and rs.dataset else None
+        gentime = datetime.now().time()
+
+        ret = base.format(**locals())
+        log.info("[Scalar.input] : {0}".format(ret))
+        return ret
+
+
+    @staticmethod
+    def input2(rs):
+        """ Unused: WIP note for required input format """
+        """<input type="number" name="value"  step="any" value={%if rs.dataset and rs.dataset.value not in ('', None)%}{{rs.dataset.value}}{%else%}""{%endif%}  class="{{data_type}} value"></input>"""
+
+        value = rs.dataset.value if rs and rs.dataset else None
+        gentime = datetime.now().time()
+        return """<{edit[type]} id="{edit[id]}{rs.attr_id}" step="edit[step]" class="{edit[class]}" type="{edit[form]}" name="{edit[name]}" gentime="{gentime} "value="{value}"></{edit[type]}>""".format(**Scalar.ui_schema, **locals())
+
     value = property(get_value, set_value)
+
+
 
 
 class Array(DataType):
@@ -114,7 +144,6 @@ class Array(DataType):
     json     = ArrayJSON()
 
     def __init__(self, encstr):
-        super(Array, self).__init__()
         self.value = encstr
         self.validate()
 
@@ -138,13 +167,14 @@ class Array(DataType):
     value = property(get_value, set_value)
 
 
+
 class Descriptor(DataType):
+    """ Unused obsolete type """
     tag      = "DESCRIPTOR"
     skeleton = "%s"
     json     = DescriptorJSON()
 
     def __init__(self, data):
-        super(Descriptor, self).__init__()
         self.value = data
         self.validate()
 
@@ -181,7 +211,6 @@ class Dataframe(DataType):
     json     = DataframeJSON()
 
     def __init__(self, data):
-        super(Dataframe, self).__init__()
         self.value = data
         self.validate()
 
@@ -232,7 +261,6 @@ class Timeseries(DataType):
     json     = TimeseriesJSON()
 
     def __init__(self, ts):
-        super(Timeseries, self).__init__()
         self.value = ts
         self.validate()
 
