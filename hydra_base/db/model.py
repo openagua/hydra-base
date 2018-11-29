@@ -76,6 +76,18 @@ def get_timestamp(ordinal):
 #Data
 #***************************************************
 
+def _is_admin(user_id):
+    """
+        Is the specified user an admin
+    """
+    user = get_session().query(User).filter(User.id==user_id).one()
+
+    if user.is_admin():
+        return True
+    else:
+        return False
+
+
 class Inspect(object):
     _parents = []
     _children = []
@@ -209,6 +221,9 @@ class Dataset(Base, Inspect):
             Check whether this user can read this dataset
         """
 
+        if _is_admin(user_id):
+            return
+
         for owner in self.owners:
             if int(owner.user_id) == int(user_id):
                 if owner.view == 'Y':
@@ -236,6 +251,8 @@ class Dataset(Base, Inspect):
         """
             Check whether this user can write this dataset
         """
+        if _is_admin(user_id):
+            return
 
         for owner in self.owners:
             if owner.user_id == int(user_id):
@@ -250,6 +267,9 @@ class Dataset(Base, Inspect):
         """
             Check whether this user can write this dataset
         """
+
+        if _is_admin(user_id):
+            return
 
         for owner in self.owners:
             if owner.user_id == int(user_id):
@@ -700,6 +720,12 @@ class Project(Base, Inspect):
         """
             Check whether this user can read this project
         """
+        
+        if _is_admin(user_id):
+            return
+
+        if str(user_id) == str(self.created_by):
+            return
 
         for owner in self.owners:
             if owner.user_id == user_id:
@@ -715,6 +741,12 @@ class Project(Base, Inspect):
             Check whether this user can write this project
         """
 
+        if _is_admin(user_id):
+            return
+
+        if str(user_id) == str(self.created_by):
+            return
+
         for owner in self.owners:
             if owner.user_id == int(user_id):
                 if owner.view == 'Y' and owner.edit == 'Y':
@@ -728,6 +760,12 @@ class Project(Base, Inspect):
         """
             Check whether this user can write this project
         """
+
+        if _is_admin(user_id):
+            return
+
+        if str(user_id) == str(self.created_by):
+            return
 
         for owner in self.owners:
             if owner.user_id == int(user_id):
@@ -792,7 +830,7 @@ class Network(Base, Inspect):
         l = Link()
         l.name        = name
         l.description = desc
-        l.layout           = str(layout) if layout is not None else None
+        l.layout           = json.dumps(layout) if layout is not None else None
         l.node_a           = node_1
         l.node_b           = node_2
 
@@ -867,6 +905,7 @@ class Network(Base, Inspect):
         return owner
 
     def unset_owner(self, user_id):
+
         owner = None
         if str(user_id) == str(self.created_by):
             log.warn("Cannot unset %s as owner, as they created the network", user_id)
@@ -881,6 +920,8 @@ class Network(Base, Inspect):
         """
             Check whether this user can read this network
         """
+        if _is_admin(user_id):
+            return
 
         if int(self.created_by) == int(user_id):
             return
@@ -898,6 +939,8 @@ class Network(Base, Inspect):
         """
             Check whether this user can write this project
         """
+        if _is_admin(user_id):
+            return
 
         if int(self.created_by) == int(user_id):
             return
@@ -915,6 +958,9 @@ class Network(Base, Inspect):
         """
             Check whether this user can write this project
         """
+        
+        if _is_admin(user_id):
+            return
 
         if int(self.created_by) == int(user_id):
             return
@@ -1497,6 +1543,9 @@ class Perm(Base, Inspect):
     _parents  = ['tRole', 'tPerm']
     _children = []
 
+    def __repr__(self):
+        return "{0} ({1})".format(self.name, self.code)
+
 class Role(Base, Inspect):
     """
     """
@@ -1517,6 +1566,9 @@ class Role(Base, Inspect):
     def permissions(self):
         return set([rp.perm for rp in self.roleperms])
 
+    def __repr__(self):
+        return "{0} ({1})".format(self.name, self.code)
+
 
 class RolePerm(Base, Inspect):
     """
@@ -1534,6 +1586,9 @@ class RolePerm(Base, Inspect):
     _parents  = ['tRole', 'tPerm']
     _children = []
 
+    def __repr__(self):
+        return "{0}".format(self.perm)
+
 class RoleUser(Base, Inspect):
     """
     """
@@ -1549,6 +1604,9 @@ class RoleUser(Base, Inspect):
 
     _parents  = ['tRole', 'tUser']
     _children = []
+
+    def __repr__(self):
+        return "{0}".format(self.role.name)
 
 class User(Base, Inspect):
     """
@@ -1588,6 +1646,19 @@ class User(Base, Inspect):
         for ur in self.roleusers:
             roles.append(ur.role)
         return set(roles)
+
+    def is_admin(self):
+        """
+            Check that the user has a role with the code 'admin'
+        """
+        for ur in self.roleusers:
+            if ur.role.code == 'admin':
+                return True
+
+        return False
+
+    def __repr__(self):
+        return "{0}".format(self.username)
 
 
 def create_resourcedata_view():

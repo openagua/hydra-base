@@ -79,7 +79,7 @@ def get_types_by_attr(resource, template_id=None):
 
     all_types = db.DBSession.query(TemplateType).options(joinedload_all('typeattrs')).filter(TemplateType.resource_type==resource.ref_key)
     if template_id is not None:
-        all_types = all_types.filter(TemplateType.id==template_id)
+        all_types = all_types.filter(TemplateType.template_id==template_id)
 
     all_types = all_types.all()
 
@@ -1370,6 +1370,8 @@ def update_template(template,**kwargs):
                 _update_templatetype(templatetype, type_i)
                 existing_templatetypes.append(type_i.id)
             else:
+                #Give it a template ID if it doesn't have one
+                templatetype.template_id = template.id
                 new_templatetype_i = _update_templatetype(templatetype)
                 existing_templatetypes.append(new_templatetype_i.id)
 
@@ -1442,7 +1444,7 @@ def get_template_by_name(name,**kwargs):
         return tmpl_i
     except NoResultFound:
         log.info("%s is not a valid identifier for a template",name)
-        return None
+        raise HydraError('Template "%s" not found'%name)
 
 def add_templatetype(templatetype,**kwargs):
     """

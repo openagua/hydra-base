@@ -263,7 +263,8 @@ class TestTimeSeries:
             qry_times,
            )
 
-        return_val = seasonal_vals['dataset_%s'%val_to_query.id]
+        #TODO: Figure out why the mysqlclient library with python 2.7.14 was causing this to break
+        return_val = seasonal_vals['dataset_%s'%int(val_to_query.id)]
 
         dataset_vals = val_a['0']
 
@@ -620,3 +621,34 @@ class TestDataCollection:
             updated_dataset_ids.append(item.dataset_id)
 
         assert dataset_id not in updated_dataset_ids
+
+class TestiUtilities:
+    """
+        Test hydra's internal utilities relating to data transformations etc.
+    """
+    @pytest.mark.parametrize("test_input,expected", [
+        ({}, 0),
+        ({'a':1}, 1),
+        ({'a': {'b': 2}}, 2),
+        ({'a': {'b':{}}}, 2),
+        ({1: {2: 2}}, 2),
+    ])
+    def test_count_levels(self, test_input, expected):
+        assert hb.util.count_levels(test_input) == expected
+    
+    @pytest.mark.parametrize("test_input,expected", [
+        ({}, {}),
+        ({'a':1}, {'a':1}),
+        ({'a': {'b': 2}}, {'a_b': 2}),
+        ({'a': {'b':{}}}, {'a_b': {}}),
+        ({1: {2: 2}}, {'1_2': 2}),
+    ])
+    def test_flatten_dict(self, test_input, expected):
+        assert hb.util.flatten_dict(test_input) == expected
+
+
+
+
+
+    
+

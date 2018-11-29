@@ -311,6 +311,14 @@ class TestTemplates:
         new_template_j.templatetypes[0].name = "Test type 3"
         updated_type_id = new_template_j.templatetypes[0].id
 
+        #add a new type
+        new_type = JSONObject()
+        new_type.name = "New Node type"
+        new_type.alias = "New Node type alias"
+        new_type.resource_type = 'NODE'
+        new_type.typeattrs = []
+        new_template_j.templatetypes.append(new_type)
+
         #add an template attr to one of the types
         tattr_3 = JSONObject()
         tattr_3.attr_id = attr_3.id
@@ -595,9 +603,9 @@ class TestTemplates:
         assert new_template.name == template2.name, "Names are not the same! Retrieval by name did not work!"
 
     def test_get_template_by_name_bad(self, session):
-        new_template = hb.get_template_by_name("Not a template!")
 
-        assert new_template is None
+        with pytest.raises(HydraError):
+            new_template = hb.get_template_by_name("Not a template!")
 
     def test_add_resource_type(self, session, template2):
 

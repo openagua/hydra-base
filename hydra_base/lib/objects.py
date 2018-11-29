@@ -20,9 +20,6 @@
 import json
 import six
 
-import logging
-log = logging.getLogger(__name__)
-
 from datetime import datetime
 from ..exceptions import HydraError
 
@@ -31,6 +28,9 @@ from .HydraTypes.Registry import HydraObjectFactory
 from ..util import generate_data_hash, get_layout_as_dict, get_layout_as_string
 from .. import config
 import pandas as pd
+
+import logging
+log = logging.getLogger(__name__)
 
 class JSONObject(dict):
     """
@@ -74,6 +74,9 @@ class JSONObject(dict):
                 #TODO what is a better way to identify a dataset?
                 if 'unit' in v or 'metadata' in v or 'type' in v:
                     setattr(self, k, Dataset(v, obj_dict))
+                #The value on a dataset should remain untouched
+                elif k == 'value':
+                    setattr(self, k, v)
                 else:
                     setattr(self, k, JSONObject(v, obj_dict))
             elif isinstance(v, list):
@@ -81,7 +84,10 @@ class JSONObject(dict):
                 if k == 'metadata' and obj_dict is not None:
                     setattr(self, k, JSONObject(obj_dict.get_metadata_as_dict()))
                 else:
-                    l = [JSONObject(item, obj_dict) for item in v]
+                    if (len(v) > 0 and isinstance(v[0], float)):
+                        l = v
+                    else:
+                        l = [JSONObject(item, obj_dict) for item in v]
                     setattr(self, k, l)
             #Special case for SQLAlchemy objects, to stop them recursing up and down
             elif hasattr(v, '_sa_instance_state')\
