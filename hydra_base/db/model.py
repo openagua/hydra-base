@@ -426,7 +426,7 @@ class Template(Base, Inspect):
     __tablename__='tTemplate'
 
     id = Column(Integer(), primary_key=True, nullable=False)
-    name = Column(String(60),  nullable=False, unique=True)
+    name = Column(String(200),  nullable=False, unique=True)
     cr_date = Column(TIMESTAMP(),  nullable=False, server_default=text(u'CURRENT_TIMESTAMP'))
     layout  = Column(Text().with_variant(mysql.TEXT(4294967295), 'mysql'),  nullable=True)
 
@@ -992,7 +992,7 @@ class Link(Base, Inspect):
     status = Column(String(1),  nullable=False, server_default=text(u"'A'"))
     node_1_id = Column(Integer(), ForeignKey('tNode.id'), nullable=False)
     node_2_id = Column(Integer(), ForeignKey('tNode.id'), nullable=False)
-    name = Column(String(60))
+    name = Column(String(200))
     description = Column(String(1000))
     layout  = Column(Text().with_variant(mysql.TEXT(4294967295), 'mysql'),  nullable=True)
     cr_date = Column(TIMESTAMP(),  nullable=False, server_default=text(u'CURRENT_TIMESTAMP'))
