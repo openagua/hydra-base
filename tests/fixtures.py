@@ -73,6 +73,7 @@ def session(db, engine, request):
     util.create_user("UserA")
     util.create_user("UserB")
     util.create_user("UserC")
+    util.create_user("notadmin")
 
     yield session
 
@@ -121,10 +122,10 @@ def attribute():
 @pytest.fixture()
 def projectmaker():
     class ProjectMaker:
-        def create(self, name=None):
+        def create(self, name=None, share=True):
             if name is None:
                 name = 'Project %s' % (datetime.datetime.now())
-            return util.create_project(name=name)
+            return util.create_project(name=name, share=share)
 
     return ProjectMaker()
 

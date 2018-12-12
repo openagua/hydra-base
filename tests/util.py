@@ -58,7 +58,8 @@ def create_user(name):
     #make the user an admin user by default
     role =  JSONObject(hydra_base.get_role_by_code('admin', user_id=pytest.root_user_id))
 
-    hydra_base.set_user_role(new_user.id, role.id, user_id=pytest.root_user_id)
+    if name.lower() != 'notadmin':
+        hydra_base.set_user_role(new_user.id, role.id, user_id=pytest.root_user_id)
 
     return new_user
 
@@ -221,7 +222,7 @@ def create_template():
 
     return new_template
 
-def create_project(name=None):
+def create_project(name=None, share=True):
 
     if name is None:
         name = "Unittest Project"
@@ -233,7 +234,8 @@ def create_project(name=None):
         project.name = name
         project.description = "Project which contains all unit test networks"
         project = JSONObject(hydra_base.add_project(project, user_id=pytest.root_user_id))
-        hydra_base.share_project(project.id,
+        if share is True:
+            hydra_base.share_project(project.id,
                                  ["UserA", "UserB", "UserC"],
                                  'N',
                                  'Y',
@@ -931,7 +933,7 @@ def create_attributegroup(project_id, name=None, exclusive='N'):
 
 def get_by_name(name, entity_list):
     """
-        given a list of JSONObjects with a name attribute, return the JSONObeect with the 
+        given a list of JSONObjects with a name attribute, return the JSONObeect with the
         specified name
     """
     entity_dict = {}
@@ -939,4 +941,3 @@ def get_by_name(name, entity_list):
         entity_dict[e.name] = e
 
     return entity_dict[name]
-

@@ -613,7 +613,7 @@ class TestNetwork:
         network = network_with_data
 
         link_to_delete = network.links[0]
-        
+
         hb.set_link_status(link_to_delete.id, 'X', user_id=pytest.root_user_id)
 
         new_network = JSONObject(hb.get_network(network.id, user_id=pytest.root_user_id))
@@ -635,7 +635,7 @@ class TestNetwork:
         network = network_with_data
 
         link_to_delete = network.links[0]
-        
+
         #'N' is for purge_data
         hb.delete_link(link_to_delete.id, 'N', user_id=pytest.root_user_id)
 
@@ -991,6 +991,49 @@ class TestNetwork:
             if d.type == 'timeseries':
                 with pytest.raises(hb.exceptions.HydraError):
                     hb.get_dataset(d.id, user_id=pytest.root_user_id)
+
+
+    def test_get_all_network_owners(self, session, projectmaker, networkmaker):
+        proj = projectmaker.create()
+
+        net1 = networkmaker.create(project_id=proj.id)
+        hydra_base.share_network(net1.id,
+                                 ["notadmin"],
+                                 'N',
+                                 'Y',
+                                 user_id=pytest.root_user_id)
+
+        networkowners = hb.get_all_network_owners(user_id=pytest.root_user_id)
+
+        assert len(networkowners) == 2
+
+        networkowners = hb.get_all_network_owners([proj.id], user_id=pytest.root_user_id)
+        assert len(networkowners) == 2
+
+        with pytest.raises(hb.exceptions.PermissionError):
+            networkowners = hb.get_all_network_owners([net1.id], user_id=5)
+
+    def test_bulk_set_network_owners(self, session, networkmaker):
+        net = networkmaker.create()
+
+        networkowners = hb.get_all_network_owners([net.id], user_id=pytest.root_user_id)
+
+        assert len(networkowners) == 1
+        
+        new_owner = JSONObject(dict(
+            network_id=net.id,
+            user_id=2,
+            view='Y',
+            edit='Y',
+            share='Y',
+        ))
+
+        hydra_base.bulk_set_network_owners([new_owner], user_id=pytest.root_user_id)
+
+        networkowners = hb.get_all_network_owners([net.id], user_id=pytest.root_user_id)
+
+        assert len(networkowners) == 2
+
 
 if __name__ == '__main__':
     server.run()
