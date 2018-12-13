@@ -288,14 +288,13 @@ def unhide_dataset(dataset_id,**kwargs):
     db.DBSession.flush()
 
 
-@required_role("admin")
+#@required_role("admin")
 def get_all_project_owners(project_ids=None, **kwargs):
     """
         Get the project owner entries for all the requested projects.
         If the project_ids argument is None, return all the owner entries
         for ALL projects
     """
-
 
     projowner_qry = db.DBSession.query(ProjectOwner)
 
@@ -306,7 +305,7 @@ def get_all_project_owners(project_ids=None, **kwargs):
 
     return [JSONObject(project_owner_i) for project_owner_i in project_owners_i]
 
-@required_role("admin")
+#@required_role("admin")
 def get_all_network_owners(network_ids=None, **kwargs):
     """
         Get the network owner entries for all the requested networks.
@@ -324,7 +323,7 @@ def get_all_network_owners(network_ids=None, **kwargs):
 
     return [JSONObject(network_owner_i) for network_owner_i in network_owners_i]
 
-@required_role("admin")
+#@required_role("admin")
 def bulk_set_project_owners(project_owners, **kwargs):
     """
         Set the project owner of multiple projects at once.
@@ -364,7 +363,7 @@ def bulk_set_project_owners(project_owners, **kwargs):
 
     db.DBSession.flush()
 
-@required_role("admin")
+#@required_role("admin")
 def bulk_set_network_owners(network_owners, **kwargs):
     """
         Set the network owner of multiple networks at once.
