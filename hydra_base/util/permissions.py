@@ -23,6 +23,10 @@ from ..db.model import Perm, User, Role, RolePerm, RoleUser
 from sqlalchemy.orm.exc import NoResultFound
 from ..exceptions import PermissionError
 
+import logging
+log = logging.getLogger(__name__)
+level = logging.getLevelName('DEBUG')
+log.setLevel(level)
 
 
 def check_perm(user_id, permission_code):
@@ -75,6 +79,7 @@ def required_role(req_role):
         @wraps(wfunc)
         def wrapped(*args, **kwargs):
             user_id = kwargs.get("user_id")
+            log.info("************************************************{}******************************".format(user_id))
             try:
                 res = db.DBSession.query(RoleUser).filter(RoleUser.user_id==user_id).join(Role, Role.code==req_role).one()
             except NoResultFound:
