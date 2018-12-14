@@ -360,8 +360,9 @@ def bulk_set_project_owners(project_owners, **kwargs):
         new_po.share      = project_owner.share
 
         db.DBSession.add(new_po)
+        db.DBSession.flush()
 
-    db.DBSession.flush()
+    #db.DBSession.flush()
 
 #@required_role("admin")
 def bulk_set_network_owners(network_owners, **kwargs):
@@ -401,4 +402,4 @@ def bulk_set_network_owners(network_owners, **kwargs):
 
         db.DBSession.add(new_no)
 
-    db.DBSession.flush()
+        db.DBSession.flush()
