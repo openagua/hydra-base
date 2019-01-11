@@ -253,7 +253,8 @@ class Units(object):
         if dimension in self.dimensions.keys() and \
                 unit['abbr'] not in self.dimensions[dimension]:
 
-            log.info("New unit", unit)
+            log.info("Creating a new unit")
+            log.info(unit)
             # 'info' is the only field that is allowed to be empty
             if 'info' not in unit.keys() or unit['info'] is None:
                 unit['info'] = ''
@@ -350,7 +351,7 @@ class Units(object):
         """
         user_unitfile = self.usertree.base
         with open(user_unitfile, 'w') as f:
-            f.write(etree.tostring(self.usertree, pretty_print=True))
+            f.write(etree.tostring(self.usertree, encoding='unicode', pretty_print=True))
 
 
 
@@ -548,6 +549,8 @@ def set_all_units(units_list):
         Get the list of all the units passed and try adding all of them
     """
     hydra_units.set_all_units(units_list)
+    hydra_units.save_user_file()
+    return True
 
 def check_consistency(unit, dimension,**kwargs):
     """Check if a given units corresponds to a physical dimension.
