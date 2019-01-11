@@ -112,8 +112,8 @@
         <unit name="day"        abbr="day"     lf="86400"              cf="0" />
         <unit name="hour"       abbr="h"    lf="3600"               cf="0" />
         <unit name="minute"     abbr="min"  lf="60"                 cf="0" />
-        <unit name="month"      abbr="mon"     lf="2629743.8328"       cf="0"  info="Here: 1 month =  1/12 year. 
-            January = 31 days 
+        <unit name="month"      abbr="mon"     lf="2629743.8328"       cf="0"  info="Here: 1 month =  1/12 year.
+            January = 31 days
             February, 28 days, 29 in leap years, or 30 on certain occasions in related calendars
             March, 31 days
             April, 30 days
@@ -282,11 +282,11 @@
     </dimension>
     <dimension name="Density">
         <unit name="kilograms per cubic-metre" abbr="kg m^-3" lf="1.0" cf="0.0" info=""/>
-		<unit name="kilograms per megalitre" abbr="kg Ml^-1" lf="0.0001" cf="0.0" info=""/>
-		<unit name="parts per billion" abbr="ppb" lf="0.000001" cf="0.0" info=""/>
+		    <unit name="kilograms per megalitre" abbr="kg Ml^-1" lf="0.0001" cf="0.0" info=""/>
+		    <unit name="parts per billion" abbr="ppb" lf="0.000001" cf="0.0" info=""/>
     </dimension>
     <dimension name="Monetary value">
-		<unit abbr="USD" cf="0" info="" lf="1.0" name="US Dollar"/>
+		    <unit abbr="USD" cf="0" info="" lf="1.0" name="US Dollar"/>
         <unit abbr="GBP" cf="0" info="" lf="0.66" name="Pound Sterling"/>
     </dimension>
     <dimension name="Energy price">
@@ -299,12 +299,12 @@
     </dimension>
     <dimension name="Unit price (volume)">
         <unit name="US Dollar per cubic metre" abbr="USD m^-3"     lf="1.0" cf="0.0" info=""/>
-		<unit name="US Dollar per million cubic metre" abbr="USD Mm^-3"  lf="0.0000001" cf="0.66" info=""/>
-		<unit name="US Dollar per megalitre" abbr="USD Ml^-1"     lf="0.0001" cf="0.0" info=""/>
+    		<unit name="US Dollar per million cubic metre" abbr="USD Mm^-3"  lf="0.0000001" cf="0.66" info=""/>
+    		<unit name="US Dollar per megalitre" abbr="USD Ml^-1"     lf="0.0001" cf="0.0" info=""/>
         <unit name="US Dollar per acre-foot"    abbr="USD ac-ft^-1" lf="0.000810713194" cf="0.0" info=""/>
-		<unit name="Pound Sterling per cubic metre" abbr="GBP m^-3"     lf="0" cf="0.66" info=""/>
-		<unit name="Pound Sterling per million cubic metre" abbr="GBP Mm^-3" lf="0.00000066" cf="0.66" info=""/>
-		<unit name="Pound Sterling per megalitre" abbr="GBP Ml^-1"     lf="0" cf="0.000066" info=""/>
+    		<unit name="Pound Sterling per cubic metre" abbr="GBP m^-3"     lf="0" cf="0.66" info=""/>
+    		<unit name="Pound Sterling per million cubic metre" abbr="GBP Mm^-3" lf="0.00000066" cf="0.66" info=""/>
+    		<unit name="Pound Sterling per megalitre" abbr="GBP Ml^-1"     lf="0" cf="0.000066" info=""/>
     </dimension>
     <dimension name="Unit price (mass)">
         <unit name="US Dollar per kilogram" abbr="USD kg^-1" lf="1.0" cf="0.0" info=""/>
@@ -332,7 +332,7 @@
         <unit name="Pound Sterling per year"   abbr="GBP yr^-1"   lf="2.091458464e-08" cf="0.0" info=""/>
     </dimension>
     <dimension name="dimensionless">
-		<unit abbr="date" cf="0" info="" lf="1" name="No unit"/>
+		    <unit abbr="date" cf="0" info="" lf="1" name="No unit"/>
         <unit abbr="-" cf="0" info="" lf="1" name="No unit"/>
         <unit abbr="%" cf="0" info="" lf="0.01" name="Percent"/>
     </dimension>
