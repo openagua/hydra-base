@@ -1,2 +1,12 @@
+<!--
 <UNITS>
+</UNITS>
+-->
+<UNITS>
+    <dimension name="Length">
+        <unit name="città" abbr="CTA" lf="1e-10" cf="0" info="Numero di città" />
+    </dimension>
+    <dimension name="Pippo">
+        <unit name="foo" abbr="FOO" lf="1e-10" cf="0" info="De no" />
+    </dimension>
 </UNITS>
