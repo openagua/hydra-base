@@ -113,6 +113,7 @@ class Units(object):
                 self.unit_info.update({unit.get('abbr'):
                                        unit.get('info')})
 
+                # Tranforming the unit from etree to a dict and adding the relative dimension
                 unit_dict = self._get_unit_dict(unit)
                 unit_dict['dimension'] = dimension
                 self.all_units_list.append(unit_dict) # Complete list with the dimension name
@@ -187,6 +188,15 @@ class Units(object):
         """
         return self.all_units_list
 
+    def set_all_units(self, units_list):
+        """
+            Save all the units contained in the passed list, with the name of their dimension.
+        """
+        for unit in units_list:
+            self.add_unit(unit["dimension"], unit)
+            #log.info(unit)
+
+
     def get_units(self, dimension):
         """Get a list of all units describing one specific dimension.
         """
@@ -243,6 +253,7 @@ class Units(object):
         if dimension in self.dimensions.keys() and \
                 unit['abbr'] not in self.dimensions[dimension]:
 
+            log.info("New unit", unit)
             # 'info' is the only field that is allowed to be empty
             if 'info' not in unit.keys() or unit['info'] is None:
                 unit['info'] = ''
@@ -273,6 +284,7 @@ class Units(object):
                 self.usertree.append(dimension_element)
                 self.userdimensions.append(dimension)
         else:
+            # log.info("Existing unit", unit)
             return False
 
     def update_unit(self, dimension, unit):
@@ -530,6 +542,12 @@ def get_all_units():
     """
     units_list = hydra_units.get_all_units()
     return units_list
+
+def set_all_units(units_list):
+    """
+        Get the list of all the units passed and try adding all of them
+    """
+    hydra_units.set_all_units(units_list)
 
 def check_consistency(unit, dimension,**kwargs):
     """Check if a given units corresponds to a physical dimension.
