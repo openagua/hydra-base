@@ -20,7 +20,7 @@
 import os
 from copy import deepcopy
 from lxml import etree
-
+import json
 from .. import config
 from ..exceptions import HydraError
 from ..util.dataset_util import array_dim
@@ -46,6 +46,7 @@ class Units(object):
     usertree = None
     dimensions = dict()
     units = dict()
+    all_units_list = []
     userunits = []
     userdimensions = []
     static_dimensions = []
@@ -112,6 +113,20 @@ class Units(object):
                 self.unit_info.update({unit.get('abbr'):
                                        unit.get('info')})
 
+                unit_dict = self._get_unit_dict(unit)
+                unit_dict['dimension'] = dimension
+                self.all_units_list.append(unit_dict) # Complete list with the dimension name
+
+
+
+    def _get_unit_dict(self, unit):
+        # Given an unit as etree object, returns a dict containing its attributes values
+        unitdict = dict()
+        for key in unit.attrib:
+            unitdict[key] = unit.attrib[key]
+        return unitdict
+
+
     def check_consistency(self, unit, dimension):
         """Check whether a specified unit is consistent with the physical
         dimension asked for by the attribute or the dataset.
@@ -165,6 +180,12 @@ class Units(object):
         """Get a list of all dimenstions listed in one of the xml files.
         """
         return self.dimensions.keys()
+
+    def get_all_units(self):
+        """
+            Get the list all units contained in the xml file, with the name of their dimension.
+        """
+        return self.all_units_list
 
     def get_units(self, dimension):
         """Get a list of all units describing one specific dimension.
@@ -500,6 +521,15 @@ def get_units(dimension,**kwargs):
         )
         unit_dict_list.append(cm_unit)
     return unit_dict_list
+
+
+def get_all_units():
+    """
+        Get the list of all the units contained
+        in the default file AND the user file all together
+    """
+    units_list = hydra_units.get_all_units()
+    return units_list
 
 def check_consistency(unit, dimension,**kwargs):
     """Check if a given units corresponds to a physical dimension.
