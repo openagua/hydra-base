@@ -24,6 +24,7 @@ from decimal import Decimal
 import pandas as pd
 
 from ast import literal_eval
+from json.decoder import JSONDecodeError
 
 import json
 import six
@@ -243,5 +244,8 @@ def get_json_as_dict(json_string_or_dict):
     if(isinstance(json_string_or_dict, six.string_types)):
         try:
             return get_json_as_dict(json.loads(json_string_or_dict))
+        except JSONDecodeError:
+            # Maybe the json is poorly formatted
+            return get_json_as_dict(literal_eval(json_string_or_dict))
         except:
             return json_string_or_dict
