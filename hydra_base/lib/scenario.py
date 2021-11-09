@@ -39,7 +39,7 @@ from ..db.model import Scenario,\
 
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy import or_, and_, func
-from sqlalchemy.orm import joinedload, joinedload_all, aliased
+from sqlalchemy.orm import joinedload, aliased
 from . import data
 from collections import namedtuple
 from copy import deepcopy
@@ -1310,7 +1310,7 @@ def get_resource_attribute_data(ref_key, ref_id, scenario_id, attr_id, **kwargs)
             ResourceAttr.node_id == ref_id,
             ResourceAttr.link_id == ref_id,
             ResourceAttr.group_id == ref_id
-        )).distinct().options(joinedload('resourceattr')).options(joinedload_all('dataset.metadata'))
+        )).distinct().options(joinedload('resourceattr')).options(joinedload('dataset.metadata'))
 
     if attr_id is not None:
         if not isinstance(attr_id, list):
@@ -1377,7 +1377,7 @@ def get_scenarios_data(scenario_id, attr_id=None, type_id=None, node_ids=None, l
             ResourceScenario.scenario_id == scenario.id) \
             .distinct() \
             .options(joinedload('resourceattr')) \
-            .options(joinedload_all('dataset.metadata'))
+            .options(joinedload('dataset.metadata'))
 
         attr_ids = []
         if type_id and not attr_id:
