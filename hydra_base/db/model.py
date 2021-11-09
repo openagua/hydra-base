@@ -1153,7 +1153,7 @@ class ResourceAttr(Base, Inspect):
     link_id = Column(Integer(), ForeignKey('tLink.id'), index=True, nullable=True)
     group_id = Column(Integer(), ForeignKey('tResourceGroup.id'), index=True, nullable=True)
     attr_is_var = Column(String(1), nullable=False, server_default=text(u"'N'"))
-    properties = Column(Text().with_variant(mysql.LONGTEXT, 'mysql'), server_default='{}')
+    properties = Column(Text().with_variant(mysql.LONGTEXT, 'mysql'), nullable=True)
     cr_date = Column(TIMESTAMP(), nullable=False, server_default=text(u'CURRENT_TIMESTAMP'))
 
     attr = relationship('Attr')

@@ -736,7 +736,6 @@ def _get_all_resource_attributes(network_id, template_id=None, include_non_templ
     template_attr_lookup, all_network_typeattrs = _get_network_template_attribute_lookup(network_id)
 
     for resource_attr in all_resource_attributes:
-        resource_attr.properties = resource_attr.properties or {}
 
         if template_id is not None:
             #check if it's in the template. If not, it's either associated to another
