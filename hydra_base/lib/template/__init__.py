@@ -475,6 +475,7 @@ def add_template(template, **kwargs):
     """
     tmpl = Template()
     tmpl.name = template.name
+    tmpl.created_by = kwargs.get('user_id')
     if template.parent_id:
         tmpl.parent_id = template.parent_id
     if template.description:
