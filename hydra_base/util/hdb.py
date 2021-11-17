@@ -59,8 +59,8 @@ def add_resource_types(resource_i, types):
 
         rt_i = ResourceType()
         rt_i.type_id     = templatetype.id
+        rt_i.template_id = templatetype.template_id
         rt_i.ref_key     = resource_i.ref_key
-        rt_i.template_id = resource_i.child_template_id
         if resource_i.ref_key == 'NODE':
             rt_i.node_id      = resource_i.id
         elif resource_i.ref_key == 'LINK':
