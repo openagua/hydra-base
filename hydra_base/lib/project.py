@@ -235,14 +235,12 @@ def get_projects(uid, include_shared_projects=True, projects_ids_list_filter=Non
             else:
                 projects_qry = projects_qry.filter(Project.id.in_(projects_ids_list_filter))
 
-
-
-    projects_qry = projects_qry.options(noload('networks')).order_by('id')
-
     page = kwargs.get('page')
     max_per_page = kwargs.get('max_per_page', 10)
     if page is not None:
         projects_qry = projects_qry.offset(page*max_per_page).limit(max_per_page)
+
+    projects_qry = projects_qry.options(noload('networks')).order_by('id')
 
     projects_i = projects_qry.all()
 
