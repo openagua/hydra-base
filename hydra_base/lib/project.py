@@ -201,7 +201,7 @@ def get_project_by_name(project_name,**kwargs):
     return ret_projects
 
 @required_perms('get_project')
-def get_projects(uid, include_shared_projects=True, projects_ids_list_filter=None, **kwargs):
+def get_projects(uid, include_shared_projects=True, projects_ids_list_filter=None, public_only=False, **kwargs):
     """
         Get all the projects owned by the specified user.
         These include projects created by the user, but also ones shared with the user.
@@ -216,14 +216,22 @@ def get_projects(uid, include_shared_projects=True, projects_ids_list_filter=Non
     #must be checked individually for ownership
     projects_qry = db.DBSession.query(Project).options(joinedload('owners')).order_by(Project.id)
 
-    log.info("Getting projects for user %s", uid)
+    if public_only is True or public_only == 'Y':
+        log.info("Getting public projects")
+        projects_qry = projects_qry.filter(Project.is_public==True)
 
-    if include_shared_projects is True:
-        projects_qry = projects_qry.join(ProjectOwner).filter(Project.status=='A',
-                                                        or_(ProjectOwner.user_id==uid,
-                                                           Project.created_by==uid))
     else:
-        projects_qry = projects_qry.join(ProjectOwner).filter(Project.created_by==uid)
+        log.info("Getting projects for user %s", uid)
+        if include_shared_projects is True:
+            projects_qry = projects_qry.join(ProjectOwner).filter(Project.status=='A',
+                                                            or_(ProjectOwner.user_id==uid,
+                                                               Project.created_by==uid))
+        else:
+            projects_qry = projects_qry.join(ProjectOwner).filter(Project.created_by==uid)
+
+    search = kwargs.get('search')
+    if search:
+        projects_qry = projects_qry.filter(Project.name.ilike(f'%{search}%'))
 
     if projects_ids_list_filter is not None:
         # Filtering the search of project id
@@ -235,10 +243,10 @@ def get_projects(uid, include_shared_projects=True, projects_ids_list_filter=Non
             else:
                 projects_qry = projects_qry.filter(Project.id.in_(projects_ids_list_filter))
 
-
     page = kwargs.get('page')
-    max_per_page = kwargs.get('max_per_page', 10)
+
     if page is not None:
+        max_per_page = kwargs.get('max_per_page', 10)
         projects_qry = projects_qry.offset((page-1)*max_per_page).limit(max_per_page)
 
     projects_qry = projects_qry.options(noload('networks'))
@@ -255,7 +263,7 @@ def get_projects(uid, include_shared_projects=True, projects_ids_list_filter=Non
     #Load each
     projects_j = []
     for project_i in projects_i:
-        if not isadmin:
+        if not isadmin and not public_only:
             #Ensure the requesting user is allowed to see the project
             project_i.check_read_permission(req_user_id)
 
@@ -268,6 +276,22 @@ def get_projects(uid, include_shared_projects=True, projects_ids_list_filter=Non
     log.info("Networks loaded projects for user %s", uid)
 
     return projects_j
+
+def get_public_projects_count(**kwargs):
+    """
+        Get the number of public projects. Useful for paging.
+    """
+
+    projects_qry = db.DBSession.query(Project).filter(Project.is_public==True).order_by(Project.id)
+
+    search = kwargs.get('search')
+
+    if search:
+        projects_qry = projects_qry.filter(Project.name.ilike(f'%{search}%'))
+
+    projects_i = projects_qry.all()
+
+    return len(projects_i)
 
 def get_projects_networks(project_ids, uid, isadmin=None, **kwargs):
     """
