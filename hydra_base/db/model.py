@@ -28,7 +28,8 @@ SMALLINT,\
 Numeric,\
 Text, \
 DateTime,\
-Unicode
+Unicode,\
+Boolean
 
 from hydra_base.lib.objects import JSONObject
 
@@ -1356,6 +1357,7 @@ class Project(Base, Inspect):
     status = Column(String(1),  nullable=False, server_default=text(u"'A'"))
     cr_date = Column(TIMESTAMP(),  nullable=False, server_default=text(u'CURRENT_TIMESTAMP'))
     created_by = Column(Integer(), ForeignKey('tUser.id'), nullable=False)
+    is_public = Column(Boolean(), nullable=True, default=False)
 
     user = relationship('User', backref=backref("projects", order_by=id))
 
