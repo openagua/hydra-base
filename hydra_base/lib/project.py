@@ -111,6 +111,7 @@ def update_project(project,**kwargs):
 
     proj_i.name        = project.name
     proj_i.description = project.description
+    proj_i.is_public = project.is_public
 
     attr_map = hdb.add_resource_attributes(proj_i, project.attributes)
     proj_data = _add_project_attribute_data(proj_i, attr_map, project.attribute_data)
