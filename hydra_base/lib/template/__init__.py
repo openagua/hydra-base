@@ -881,7 +881,7 @@ def update_templatetype(templatetype, auto_delete=False, **kwargs):
 
     return updated_type
 
-def _set_typeattr(typeattr, existing_ta=None):
+def _set_typeattr(typeattr, existing_ta=None, check_dimensions=True):
     """
         Add or update a type attribute.
         If an existing type attribute is provided, then update.
@@ -952,7 +952,7 @@ def _set_typeattr(typeattr, existing_ta=None):
     else:
         unit = units.get_unit(typeattr.unit_id)
         dimension = units.get_dimension(unit.dimension_id)
-        if typeattr.attr_id is not None and typeattr.attr_id > 0:
+        if typeattr.attr_id is not None and typeattr.attr_id > 0 and check_dimensions:
             # Getting the passed attribute, so we need to check consistency
             # between attr dimension id and typeattr dimension id
             attr = db.DBSession.query(Attr).filter(Attr.id==ta.attr_id).first()
@@ -977,14 +977,16 @@ def _set_typeattr(typeattr, existing_ta=None):
             ta.attr_id = attr.id
             ta.attr = attr
 
-    check_dimension(ta)
+    if check_dimensions:
+        check_dimension(ta)
 
     if existing_ta is None:
         log.debug("Adding ta to DB")
         db.DBSession.add(ta)
 
-    attr = db.DBSession.query(Attr).filter(Attr.id == ta.attr_id).one()
-    ta.attr = attr
+    if not hasattr(ta, 'attr'):
+        attr = db.DBSession.query(Attr).filter(Attr.id == ta.attr_id).one()
+        ta.attr = attr
 
     return ta
 
@@ -1046,6 +1048,8 @@ def _update_templatetype(templatetype, existing_tt=None, auto_delete=False, **kw
     #flag to indicate if this update results in an insert
     is_new = False
 
+    check_dimensions = kwargs.get('check_dimensions', True)
+
     if existing_tt is None:
         if "id" in templatetype and templatetype.id is not None:
             tmpltype_i = db.DBSession.query(TemplateType).filter(
@@ -1077,10 +1081,10 @@ def _update_templatetype(templatetype, existing_tt=None, auto_delete=False, **kw
                 if typeattr.type_id is not None and typeattr.type_id != tmpltype_i.id:
                     continue
 
-                ta = _set_typeattr(typeattr, ta_dict[typeattr.attr_id])
+                ta = _set_typeattr(typeattr, ta_dict[typeattr.attr_id], check_dimensions=check_dimensions)
                 existing_attrs.append(ta.attr_id)
             else:
-                ta = _set_typeattr(typeattr)
+                ta = _set_typeattr(typeattr, check_dimensions=check_dimensions)
                 tmpltype_i.typeattrs.append(ta)
                 existing_attrs.append(ta.attr_id)
 
