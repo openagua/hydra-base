@@ -906,8 +906,10 @@ def _set_typeattr(typeattr, existing_ta=None, check_dimensions=True):
     if existing_ta is None:
 
         #check for an existing TA
-        check_existing_ta = db.DBSession.query(TypeAttr)\
-            .filter(TypeAttr.attr_id == typeattr.attr_id, TypeAttr.type_id == typeattr.type_id).first()
+        check_existing_ta = None
+        if typeattr.attr_id and typeattr.type_id:
+            check_existing_ta = db.DBSession.query(TypeAttr)\
+                .filter(TypeAttr.attr_id == typeattr.attr_id, TypeAttr.type_id == typeattr.type_id).first()
 
         #There's already a TA with this attr_id in this type
         if check_existing_ta is not None:
