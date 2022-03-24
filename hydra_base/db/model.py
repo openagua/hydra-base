@@ -534,9 +534,13 @@ class Template(Base, Inspect):
 
     __tablename__ = 'tTemplate'
 
+    __table_args__ = (
+        UniqueConstraint('name', 'project_id', 'created_by', name="unique template name"),
+    )
+
     id = Column(Integer(), primary_key=True, nullable=False)
     parent_id = Column(Integer(), ForeignKey('tTemplate.id'))
-    name = Column(String(200), unique=True)
+    name = Column(String(200), unique=False)
     status = Column(String(1),  nullable=False, server_default=text(u"'A'"))
     description = Column(String(1000))
     created_by = Column(Integer(), ForeignKey('tUser.id'))
