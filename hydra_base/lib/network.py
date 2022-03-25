@@ -1189,6 +1189,7 @@ def get_network(network_id,
                 template_id=None,
                 include_non_template_attributes=False,
                 include_metadata=False,
+                include_resources=True,
                 **kwargs):
     """
         Return a whole network as a dictionary.
@@ -1229,9 +1230,10 @@ def get_network(network_id,
 
         net = JSONObject(net_i)
 
-        net.nodes = _get_nodes(network_id, template_id=template_id)
-        net.links = _get_links(network_id, template_id=template_id)
-        net.resourcegroups = _get_groups(network_id, template_id=template_id)
+        if include_resources:
+            net.nodes = _get_nodes(network_id, template_id=template_id)
+            net.links = _get_links(network_id, template_id=template_id)
+            net.resourcegroups = _get_groups(network_id, template_id=template_id)
         net.owners = _get_network_owners(network_id)
 
         if include_attributes in ('Y', True):
