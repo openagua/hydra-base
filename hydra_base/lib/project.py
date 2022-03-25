@@ -83,6 +83,7 @@ def add_project(project,**kwargs):
     proj_i.name = project.name
     proj_i.description = project.description
     proj_i.created_by = user_id
+    proj_i.is_public = project.is_public
 
     attr_map = hdb.add_resource_attributes(proj_i, project.attributes)
     db.DBSession.flush() #Needed to get the resource attr's ID

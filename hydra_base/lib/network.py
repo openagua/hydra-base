@@ -562,6 +562,7 @@ def add_network(network,**kwargs):
     net_i.projection = network.projection
     net_i.layout = network.get_json('layout')
     net_i.appdata = network.get_json('appdata')
+    net_i.is_public = network.is_public
 
     network.id = net_i.id
     db.DBSession.add(net_i)
