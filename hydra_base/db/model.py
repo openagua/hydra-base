@@ -1516,6 +1516,7 @@ class Network(Base, Inspect):
     cr_date = Column(TIMESTAMP(), nullable=False, server_default=text(u'CURRENT_TIMESTAMP'))
     projection = Column(String(200))
     created_by = Column(Integer(), ForeignKey('tUser.id'), nullable=False)
+    is_public = Column(Boolean(), nullable=True, default=False)
 
     project = relationship('Project',
                            backref=backref("networks",
