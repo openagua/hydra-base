@@ -1230,7 +1230,7 @@ def get_network(network_id,
 
         net = JSONObject(net_i)
 
-        if include_resources:
+        if include_resources in ('Y', True):
             net.nodes = _get_nodes(network_id, template_id=template_id)
             net.links = _get_links(network_id, template_id=template_id)
             net.resourcegroups = _get_groups(network_id, template_id=template_id)
@@ -1242,15 +1242,17 @@ def get_network(network_id,
                                                           include_non_template_attributes)
             log.info("Setting attributes")
             net.attributes = all_attributes['NETWORK'].get(network_id, [])
-            for node_i in net.nodes:
-                node_i.attributes = all_attributes['NODE'].get(node_i.id, [])
-            log.info("Node attributes set")
-            for link_i in net.links:
-                link_i.attributes = all_attributes['LINK'].get(link_i.id, [])
-            log.info("Link attributes set")
-            for group_i in net.resourcegroups:
-                group_i.attributes = all_attributes['GROUP'].get(group_i.id, [])
-            log.info("Group attributes set")
+
+            if include_resources in ('Y', True):
+                for node_i in net.nodes:
+                    node_i.attributes = all_attributes['NODE'].get(node_i.id, [])
+                log.info("Node attributes set")
+                for link_i in net.links:
+                    link_i.attributes = all_attributes['LINK'].get(link_i.id, [])
+                log.info("Link attributes set")
+                for group_i in net.resourcegroups:
+                    group_i.attributes = all_attributes['GROUP'].get(group_i.id, [])
+                log.info("Group attributes set")
 
             log.info("Getting scenarios")
             net.scenarios = _get_scenarios(network_id, include_data, include_results, user_id, scenario_ids)
@@ -1258,12 +1260,13 @@ def get_network(network_id,
         log.info("Setting types")
         all_types = _get_all_templates(network_id, template_id)
         net.types = all_types['NETWORK'].get(network_id, [])
-        for node_i in net.nodes:
-            node_i.types = all_types['NODE'].get(node_i.id, [])
-        for link_i in net.links:
-            link_i.types = all_types['LINK'].get(link_i.id, [])
-        for group_i in net.resourcegroups:
-            group_i.types = all_types['GROUP'].get(group_i.id, [])
+        if include_resources in ('Y', True):
+            for node_i in net.nodes:
+                node_i.types = all_types['NODE'].get(node_i.id, [])
+            for link_i in net.links:
+                link_i.types = all_types['LINK'].get(link_i.id, [])
+            for group_i in net.resourcegroups:
+                group_i.types = all_types['GROUP'].get(group_i.id, [])
 
         log.info("Getting scenarios")
 
