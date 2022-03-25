@@ -1426,6 +1426,9 @@ class Project(Base, Inspect):
         if str(user_id) == str(self.created_by):
             return True
 
+        if self.is_public:
+            return True
+
         if is_admin is None:
             is_admin = _is_admin(user_id)
 
@@ -1479,6 +1482,9 @@ class Project(Base, Inspect):
         """
 
         if str(user_id) == str(self.created_by):
+            return True
+
+        if self.is_public:
             return True
 
         if is_admin is None:
@@ -1647,6 +1653,9 @@ class Network(Base, Inspect):
         if str(user_id) == str(self.created_by):
             return True
 
+        if self.is_public:
+            return True
+
         if is_admin is None:
             is_admin = _is_admin(user_id)
 
@@ -1701,6 +1710,9 @@ class Network(Base, Inspect):
         """
 
         if str(user_id) == str(self.created_by):
+            return True
+
+        if self.is_public:
             return True
 
         if is_admin is None:
