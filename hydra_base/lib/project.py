@@ -437,7 +437,7 @@ def clone_project(project_id, recipient_user_id=None, new_project_name=None, new
     log.info("Creating a new project for cloned network")
 
     project = db.DBSession.query(Project).filter(Project.id==project_id).one()
-    project.check_write_permission(user_id)
+    project.check_read_permission(user_id)
 
     if new_project_name is None:
         user = db.DBSession.query(User).filter(User.id==user_id).one()
