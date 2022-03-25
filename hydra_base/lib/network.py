@@ -1561,6 +1561,7 @@ def update_network(network,
     net_i.projection = network.projection
     net_i.layout = network.get_json('layout')
     net_i.appdata = network.get_json('appdata')
+    net_i.is_public = network.is_public
 
     all_resource_attrs = {}
     new_network_attributes = _update_attributes(net_i, network.attributes)
