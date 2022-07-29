@@ -547,6 +547,7 @@ class Template(Base, Inspect):
     project_id = Column(Integer(), ForeignKey('tProject.id', ondelete='CASCADE'))
     cr_date = Column(TIMESTAMP(), nullable=False, server_default=text(u'CURRENT_TIMESTAMP'))
     layout  = Column(Text().with_variant(mysql.LONGTEXT, 'mysql'),  nullable=True)
+    is_public = Column(Boolean(), nullable=True, default=False)
 
     parent = relationship('Template', remote_side=[id], backref=backref("children", order_by=id))
 

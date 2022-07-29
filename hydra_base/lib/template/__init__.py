@@ -686,7 +686,7 @@ def _get_template_owners(template_id):
 
 @required_perms("get_template")
 def get_templates(load_all=True, include_inactive=False, include_shared_templates=True, uid=None, template_ids=None,
-                  project_id=None, **kwargs):
+                  project_id=None, public_only=False, **kwargs):
     """
         Get all templates.
         Args:
@@ -699,6 +699,8 @@ def get_templates(load_all=True, include_inactive=False, include_shared_template
     """
 
     tpl_query = db.DBSession.query(Template)
+    if public_only is True or public_only == 'Y':
+        tpl_query = tpl_query.filter(Template.is_public==True)
     if uid:
         if include_shared_templates:
             tpl_query = tpl_query.join(TemplateOwner).filter(or_(TemplateOwner.user_id==uid, Template.created_by==uid))
