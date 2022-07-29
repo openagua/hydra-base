@@ -246,6 +246,9 @@ def get_json_as_dict(json_string_or_dict):
             return get_json_as_dict(json.loads(json_string_or_dict))
         except JSONDecodeError:
             # Maybe the json is poorly formatted
-            return get_json_as_dict(literal_eval(json_string_or_dict))
+            try:
+                return get_json_as_dict(literal_eval(json_string_or_dict))
+            except SyntaxError:
+                return {}
         except:
             return json_string_or_dict
