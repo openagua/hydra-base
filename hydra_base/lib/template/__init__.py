@@ -723,7 +723,7 @@ def get_templates(load_all=True, include_inactive=False, include_shared_template
     else:
         full_templates = []
         for template_i in templates_i:
-            template_i.layout = template_i.layout or {}
+            template_i.layout = template_i.layout or '{}'
             full_templates.append(JSONObject(template_i))
 
     #Filter out all the inactive templates
