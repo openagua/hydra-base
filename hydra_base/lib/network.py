@@ -1093,6 +1093,7 @@ def _get_nodes(network_id, template_id=None):
 
     nodes = []
     for n in node_res:
+        n.layout = n.layout or {}
         nodes.append(JSONObject(n, extras=extras))
 
     return nodes
@@ -1116,6 +1117,7 @@ def _get_links(network_id, template_id=None):
 
     links = []
     for l in link_res:
+        l.layout = l.layout or {}
         links.append(JSONObject(l, extras=extras))
 
     return links
