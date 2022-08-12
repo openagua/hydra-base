@@ -1942,7 +1942,8 @@ def update_node(node, flush=True, **kwargs):
     except NoResultFound:
         raise ResourceNotFoundError("Node %s not found"%(node.id))
 
-    node_i.network.check_write_permission(user_id)
+    net_i = db.DBSession.query(Network).filter(Network.id == node_i.network_id).one()
+    net_i.check_write_permission(user_id)
 
     node_i.name = node.name if node.name is not None else node_i.name
     node_i.x    = node.x if node.x is not None else node_i.x
@@ -1993,7 +1994,8 @@ def set_node_status(node_id, status, **kwargs):
     except NoResultFound:
         raise ResourceNotFoundError("Node %s not found"%(node_id))
 
-    node_i.network.check_write_permission(user_id)
+    net_i = db.DBSession.query(Network).filter(Network.id == link_i.network_id).one()
+    net_i.check_write_permission(user_id)
 
     node_i.status = status
 
@@ -2194,9 +2196,11 @@ def update_link(link,**kwargs):
     #check_perm(user_id, 'edit_topology')
     try:
         link_i = db.DBSession.query(Link).filter(Link.id == link.id).one()
-        link_i.network.check_write_permission(user_id)
     except NoResultFound:
         raise ResourceNotFoundError("Link %s not found"%(link.id))
+
+    net_i = db.DBSession.query(Network).filter(Network.id == link_i.network_id).one()
+    net_i.check_write_permission(user_id)
 
     #Each of thiese should be updateable independently
     if link.name is not None:
@@ -2232,7 +2236,9 @@ def set_link_status(link_id, status, **kwargs):
     except NoResultFound:
         raise ResourceNotFoundError("Link %s not found"%(link_id))
 
-    link_i.network.check_write_permission(user_id)
+    net_i = db.DBSession.query(Network).filter(Network.id == link_i.network_id).one()
+    net_i.check_write_permission(user_id)
+
 
     link_i.status = status
     db.DBSession.flush()
