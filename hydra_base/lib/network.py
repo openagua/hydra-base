@@ -1994,7 +1994,7 @@ def set_node_status(node_id, status, **kwargs):
     except NoResultFound:
         raise ResourceNotFoundError("Node %s not found"%(node_id))
 
-    net_i = db.DBSession.query(Network).filter(Network.id == link_i.network_id).one()
+    net_i = db.DBSession.query(Network).filter(Network.id == node_i.network_id).one()
     net_i.check_write_permission(user_id)
 
     node_i.status = status
