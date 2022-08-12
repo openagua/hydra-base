@@ -2106,6 +2106,9 @@ def delete_node(node_id, purge_data,**kwargs):
     except NoResultFound:
         raise ResourceNotFoundError("Node %s not found"%(node_id))
 
+    net_i = db.DBSession.query(Network).filter(Network.id == node_i.network_id).one()
+    net_i.check_write_permission(user_id)
+
     group_items = db.DBSession.query(ResourceGroupItem).filter(
                                         ResourceGroupItem.node_id==node_id).all()
     for gi in group_items:
@@ -2116,7 +2119,6 @@ def delete_node(node_id, purge_data,**kwargs):
 
     log.info("Deleting node %s, id=%s", node_i.name, node_id)
 
-    node_i.network.check_write_permission(user_id)
     db.DBSession.delete(node_i)
     db.DBSession.flush()
     return 'OK'
@@ -2248,6 +2250,9 @@ def delete_link(link_id, purge_data,**kwargs):
     except NoResultFound:
         raise ResourceNotFoundError("Link %s not found"%(link_id))
 
+    net_i = db.DBSession.query(Network).filter(Network.id == link_i.network_id).one()
+    net_i.check_write_permission(user_id)
+
     group_items = db.DBSession.query(ResourceGroupItem).filter(
                                                     ResourceGroupItem.link_id==link_id).all()
     for gi in group_items:
@@ -2258,7 +2263,6 @@ def delete_link(link_id, purge_data,**kwargs):
 
     log.info("Deleting link %s, id=%s", link_i.name, link_id)
 
-    link_i.network.check_write_permission(user_id)
     db.DBSession.delete(link_i)
     db.DBSession.flush()
 
