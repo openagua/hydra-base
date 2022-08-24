@@ -2411,7 +2411,12 @@ def get_scenarios(network_id,**kwargs):
     except NoResultFound:
         raise ResourceNotFoundError("Network %s not found"%(network_id))
 
-    return net_i.scenarios
+    parent_id = kwargs.get('parent_id')
+    if parent_id:
+        return [s for s in net_i.scenarios if s.parent_id == parent_id]
+
+    else:
+        return net_i.scenarios
 
 def validate_network_topology(network_id,**kwargs):
     """
