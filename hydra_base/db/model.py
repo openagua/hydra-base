@@ -600,8 +600,8 @@ class Template(Base, Inspect):
         #get all the type attrs for this type, and add any which are missing
         this_typeattr_i = get_session().query(TypeAttr)\
             .filter(TypeAttr.id == typeattr_id)\
-            .options(joinedload('attr'))\
-            .options(joinedload('default_dataset')).one()
+            .options(joinedload(TypeAttr.attr))\
+            .options(joinedload(TypeAttr.default_dataset)).one()
 
         this_typeattr_i.properties = this_typeattr_i.properties or '{}'
 
@@ -643,9 +643,9 @@ class Template(Base, Inspect):
         #get all the type attrs for this type, and add any which are missing
         typeattrs_i = get_session().query(TypeAttr)\
             .filter(TypeAttr.type_id == type_id)\
-            .options(joinedload('attr'))\
-            .options(joinedload('unit'))\
-            .options(joinedload('default_dataset')).all()
+            .options(joinedload(TypeAttr.attr))\
+            .options(joinedload(TypeAttr.unit))\
+            .options(joinedload(TypeAttr.default_dataset)).all()
 
         typeattrs = []
         for ta in typeattrs_i:
@@ -733,8 +733,8 @@ class Template(Base, Inspect):
             #get all the type attrs for this type, and add any which are missing
             typeattrs_i = get_session().query(TypeAttr)\
                 .filter(TypeAttr.type_id == this_type.id)\
-                .options(joinedload('attr'))\
-                .options(joinedload('default_dataset')).all()
+                .options(joinedload(TypeAttr.attr))\
+                .options(joinedload(TypeAttr.default_dataset)).all()
 
             typeattrs = []
             for ta in typeattrs_i:
@@ -949,7 +949,7 @@ class TemplateType(Base, Inspect):
         #get all the type attrs for this type, and add any which are missing
         typeattrs_i = get_session().query(TypeAttr)\
             .filter(TypeAttr.type_id == self.id)\
-            .options(joinedload('default_dataset')).all()
+            .options(joinedload(TypeAttr.default_dataset)).all()
         typeattrs = [JSONObject(ta) for ta in typeattrs_i]
 
 
@@ -2125,9 +2125,9 @@ class Scenario(Base, Inspect):
         for child_rs in child_data:
             childrens_ras.append(child_rs.resource_attr_id)
 
-        #Add resource attributes which are not defined already
+        #Add resource attributes which are no
         rs_query = get_session().query(ResourceScenario).filter(
-            ResourceScenario.scenario_id == self.id).options(joinedload('dataset')).options(joinedload('resourceattr'))
+            ResourceScenario.scenario_id == self.id).options(joinedload(ResourceScenario.dataset).options(joinedload(ResourceScenario.resourceattr)))
 
         if ra_ids is not None:
             rs_query = rs_query.filter(ResourceScenario.resource_attr_id.in_(ra_ids))
