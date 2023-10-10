@@ -133,7 +133,6 @@ def connect(db_url=None):
             connect_args['ssl'] = {'ssl_ca': ssl_ca}
 
         engine = create_engine(db_url,
-                               encoding='utf8',
                                connect_args=connect_args,
                                pool_recycle=db_pool_recycle,
                                pool_size=db_pool_size,
