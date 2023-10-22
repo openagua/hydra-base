@@ -216,7 +216,7 @@ def get_projects(uid, include_shared_projects=True, projects_ids_list_filter=Non
 
     ##Don't load the project's networks. Load them separately, as the networks
     #must be checked individually for ownership
-    projects_qry = db.DBSession.query(Project).options(joinedload('owners')).order_by(Project.id)
+    projects_qry = db.DBSession.query(Project).options(joinedload(Project.owners)).order_by(Project.id)
 
     if public_only is True or public_only == 'Y':
         log.info("Getting public projects")
@@ -251,7 +251,7 @@ def get_projects(uid, include_shared_projects=True, projects_ids_list_filter=Non
         max_per_page = kwargs.get('max_per_page', 10)
         projects_qry = projects_qry.offset((page-1)*max_per_page).limit(max_per_page)
 
-    projects_qry = projects_qry.options(noload('networks'))
+    projects_qry = projects_qry.options(noload(Project.networks))
 
     projects_i = projects_qry.all()
 
@@ -318,7 +318,7 @@ def get_projects_networks(project_ids, uid, isadmin=None, **kwargs):
 
     log.info("Getting for all the networks for in the specified projects...")
     network_qry = db.DBSession.query(Network)\
-                                .options(joinedload('owners'))\
+                                .options(joinedload(Network.owners))\
                                 .filter(Network.project_id.in_(project_ids),\
                                         Network.status=='A')
     if not isadmin:

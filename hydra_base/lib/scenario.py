@@ -1200,7 +1200,7 @@ def get_attribute_data(attr_ids, node_ids, **kwargs):
         resource scenarios in the network
     """
     node_attrs = db.DBSession.query(ResourceAttr).\
-                                            options(joinedload('attr')).\
+                                            options(joinedload(ResourceAttr.attr)).\
                                             filter(ResourceAttr.node_id.in_(node_ids),
                                             ResourceAttr.attr_id.in_(attr_ids)).all()
 
@@ -1209,7 +1209,7 @@ def get_attribute_data(attr_ids, node_ids, **kwargs):
         ra_ids.append(ra.id)
 
 
-    resource_scenarios = db.DBSession.query(ResourceScenario).filter(ResourceScenario.resource_attr_id.in_(ra_ids)).options(joinedload('resourceattr')).options(joinedload('dataset').joinedload('metadata')).order_by(ResourceScenario.scenario_id).all()
+    resource_scenarios = db.DBSession.query(ResourceScenario).filter(ResourceScenario.resource_attr_id.in_(ra_ids)).options(joinedload(ResourceScenario.resourceattr)).options(joinedload(ResourceScenario.dataset).joinedload(Dataset.metadata)).order_by(ResourceScenario.scenario_id).all()
 
 
     for rs in resource_scenarios:
@@ -1310,7 +1310,7 @@ def get_resource_attribute_data(ref_key, ref_id, scenario_id, attr_id, **kwargs)
             ResourceAttr.node_id == ref_id,
             ResourceAttr.link_id == ref_id,
             ResourceAttr.group_id == ref_id
-        )).distinct().options(joinedload('resourceattr')).options(joinedload('dataset.metadata'))
+        )).distinct().options(joinedload(ResourceScenario.resourceattr)).options(joinedload(ResourceScenario.dataset.metadata))
 
     if attr_id is not None:
         if not isinstance(attr_id, list):
@@ -1376,8 +1376,8 @@ def get_scenarios_data(scenario_id, attr_id=None, type_id=None, node_ids=None, l
             ResourceAttr.id == ResourceScenario.resource_attr_id,
             ResourceScenario.scenario_id == scenario.id) \
             .distinct() \
-            .options(joinedload('resourceattr')) \
-            .options(joinedload('dataset.metadata'))
+            .options(joinedload(ResourceScenario.resourceattr)) \
+            .options(joinedload(ResourceScenario.dataset.metadata))
 
         attr_ids = []
         if type_id and not attr_id:

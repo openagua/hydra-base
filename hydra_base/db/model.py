@@ -631,7 +631,7 @@ class Template(Base, Inspect):
 
         #Add resource attributes which are not defined already
         this_type_i = get_session().query(TemplateType).filter(
-            TemplateType.id == type_id).options(noload('typeattrs')).one()
+            TemplateType.id == type_id).options(noload(TemplateType.typeattrs)).one()
 
         this_type = JSONObject(this_type_i)
 
@@ -713,7 +713,7 @@ class Template(Base, Inspect):
 
         #Add resource attributes which are not defined already
         types_i = get_session().query(TemplateType).filter(
-            TemplateType.template_id == self.id).options(noload('typeattrs')).all()
+            TemplateType.template_id == self.id).options(noload(TemplateType.typeattrs)).all()
         types = [JSONObject(t) for t in types_i]
 
         if child_template_id is None:
@@ -2127,7 +2127,8 @@ class Scenario(Base, Inspect):
 
         #Add resource attributes which are no
         rs_query = get_session().query(ResourceScenario).filter(
-            ResourceScenario.scenario_id == self.id).options(joinedload(ResourceScenario.dataset).options(joinedload(ResourceScenario.resourceattr)))
+            ResourceScenario.scenario_id == self.id)\
+            .options(joinedload(ResourceScenario.dataset).options(joinedload(ResourceScenario.resourceattr)))
 
         if ra_ids is not None:
             rs_query = rs_query.filter(ResourceScenario.resource_attr_id.in_(ra_ids))
