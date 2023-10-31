@@ -247,13 +247,13 @@ def get_projects(uid, include_shared_projects=True, projects_ids_list_filter=Non
 
     page = kwargs.get('page')
 
-    if page is not None:
+    if page:
         max_per_page = kwargs.get('max_per_page', 10)
         projects_qry = projects_qry.offset((page-1)*max_per_page).limit(max_per_page)
 
     projects_qry = projects_qry.options(noload(Project.networks))
 
-    projects_i = projects_qry.all()
+    projects_i = projects_qry.distinct().all()
 
     log.info("Project query done for user %s. %s projects found", uid, len(projects_i))
 
