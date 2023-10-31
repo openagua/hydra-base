@@ -28,7 +28,7 @@ from .. import config
 import os
 import datetime
 from multiprocessing import Process
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import declarative_base
 from decimal import Decimal
 from sqlalchemy import and_
 

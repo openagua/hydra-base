@@ -31,8 +31,7 @@ from zope.sqlalchemy import register
 from hydra_base.exceptions import HydraError
 
 import transaction
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, declarative_base
 
 import logging
 log = logging.getLogger(__name__)
