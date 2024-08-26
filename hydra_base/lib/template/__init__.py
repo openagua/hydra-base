@@ -629,6 +629,8 @@ def update_template(template, auto_delete=False, **kwargs):
             if ttype.id not in req_templatetype_ids:
                 delete_templatetype(ttype.id, **kwargs)
 
+    _set_template_owners([template])
+
     db.DBSession.flush()
 
     updated_templatetypes = tmpl.get_types()
@@ -713,7 +715,7 @@ def get_templates(load_all=True, include_inactive=False, include_shared_template
         tpl_query = tpl_query.filter(Template.id.in_(template_ids))
 
     templates_i = tpl_query.options(joinedload(Template.templatetypes)).all()
-    _set_template_owners(templates_i)
+    # _set_template_owners(templates_i)
 
     if load_all is True:
         full_templates = []
